@@ -1,0 +1,111 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteSettings {
+  id             String   @id @default("default")
+  brandName      String   @default("PixelForge Studio")
+  tagline        String   @default("Your Ideas. Our Code. Real Solutions.")
+  heroTitle      String   @default("Your Ideas.\nOur Code.\nReal Solutions.")
+  heroDescription String  @default("Custom digital solutions for businesses, shops, individuals and students.")
+  startingPrice  Int      @default(15000)
+  primaryEmail   String   @default("keerthiadarshmp@gmail.com")
+  secondaryEmail String   @default("barathponnusamyy@gmail.com")
+  primaryPhone   String   @default("+91 87789 79416")
+  secondaryPhone String   @default("+91 81248 44253")
+  whatsapp       String   @default("+91 87789 79416")
+  secondaryWhatsapp String @default("+91 81248 44253")
+  footerText     String   @default("Let's turn your ideas into powerful solutions.")
+  updatedAt      DateTime @updatedAt
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  icon        String   @default("Code")
+  sortOrder   Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AcademicPackage {
+  id          String   @id @default(uuid())
+  category    String   // "BCA" | "MCA"
+  projectType String   // "Minor Project" | "Major Project"
+  price       Int
+  description String
+  features    String   // JSON stringified array of feature items
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PortfolioProject {
+  id           String   @id @default(uuid())
+  title        String
+  category     String   // "Websites", "E-Commerce", "Applications", "Software", "UI/UX", "Branding", "Academic"
+  description  String
+  image        String
+  technologies String   // JSON array or comma separated
+  projectUrl   String?
+  githubUrl    String?
+  featured     Boolean  @default(false)
+  published    Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  message   String
+  image     String?
+  rating    Int      @default(5)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Enquiry {
+  id          String   @id @default(uuid())
+  name        String
+  email       String
+  phone       String
+  service     String
+  budget      String
+  description String
+  status      String   @default("NEW") // "NEW" | "CONTACTED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED"
+  notes       String?
+  source      String   @default("WEBSITE") // "WEBSITE" | "WHATSAPP" | "PHONE" | "OTHER"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Media {
+  id         String   @id @default(uuid())
+  filename   String
+  url        String
+  storageKey String
+  type       String
+  size       Int
+  createdAt  DateTime @default(now())
+}

@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --pf-primary: #1C2833;
+  --pf-secondary: #2E4053;
+  --pf-muted: #AAB7B8;
+  --pf-light: #D5DBDB;
+  --pf-bg: #F4F6F6;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #1C2833;
+}
+::-webkit-scrollbar-thumb {
+  background: #2E4053;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #AAB7B8;
+}
+
+/* Reduced Motion Respect */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
