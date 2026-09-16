@@ -11,12 +11,14 @@ interface HeroSectionProps {
     heroDescription?: string;
     startingPrice?: number;
     whatsapp?: string;
+    secondaryWhatsapp?: string;
   };
 }
 
 export default function HeroSection({ settings }: HeroSectionProps) {
   const startingPrice = settings?.startingPrice || 15000;
   const whatsappNumber = (settings?.whatsapp || "+91 87789 79416").replace(/[^0-9]/g, "");
+  const secondaryWhatsappNumber = (settings?.secondaryWhatsapp || "+91 81248 44253").replace(/[^0-9]/g, "");
 
   return (
     <section
@@ -91,10 +93,20 @@ export default function HeroSection({ settings }: HeroSectionProps) {
                 href={`https://wa.me/${whatsappNumber}?text=Hello%20PixelForge%20Studio,%20I%20would%20like%20to%20discuss%20a%20project.`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-semibold text-[#F4F6F6] bg-[#2E4053] hover:bg-[#2E4053]/80 border border-[#D5DBDB]/20 rounded-lg transition-all"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all shadow-sm"
               >
-                <MessageSquare className="w-4 h-4 text-[#AAB7B8]" />
-                Chat on WhatsApp
+                <MessageSquare className="w-4 h-4 text-emerald-600" />
+                Chat WA 1
+              </a>
+
+              <a
+                href={`https://wa.me/${secondaryWhatsappNumber}?text=Hello%20PixelForge%20Studio,%20I%20would%20like%20to%20discuss%20a%20project.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all shadow-sm"
+              >
+                <MessageSquare className="w-4 h-4 text-emerald-600" />
+                Chat WA 2
               </a>
 
               <a

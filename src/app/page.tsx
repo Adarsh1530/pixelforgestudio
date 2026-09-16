@@ -45,6 +45,7 @@ export default async function HomePage() {
       <Navbar
         brandName={activeSettings.brandName}
         whatsappNumber={activeSettings.whatsapp}
+        secondaryWhatsapp={activeSettings.secondaryWhatsapp}
       />
 
       <HeroSection settings={activeSettings} />

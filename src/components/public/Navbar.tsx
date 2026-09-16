@@ -3,17 +3,19 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import { Menu, X, MessageSquare } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface NavbarProps {
   brandName?: string;
   whatsappNumber?: string;
+  secondaryWhatsapp?: string;
 }
 
 export default function Navbar({
   brandName = "PixelForge Studio",
   whatsappNumber = "+91 87789 79416",
+  secondaryWhatsapp = "+91 81248 44253",
 }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -49,6 +51,7 @@ export default function Navbar({
   }, []);
 
   const cleanWhatsapp = whatsappNumber.replace(/[^0-9]/g, "");
+  const cleanSecondaryWhatsapp = secondaryWhatsapp.replace(/[^0-9]/g, "");
 
   const navLinks = [
     { name: "Home", href: "#hero", id: "hero" },
@@ -110,16 +113,25 @@ export default function Navbar({
             ))}
           </nav>
 
-          {/* Action CTA & Admin Link */}
-          <div className="hidden lg:flex items-center gap-3">
+          {/* Action CTAs */}
+          <div className="hidden lg:flex items-center gap-2">
             <a
               href={`https://wa.me/${cleanWhatsapp}?text=Hello%20PixelForge%20Studio,%20I%20would%20like%20to%20discuss%20a%20project.`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-[#1C2833] bg-[#F4F6F6] rounded-full hover:bg-[#D5DBDB] transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#1C2833] bg-[#F4F6F6] rounded-full hover:bg-[#D5DBDB] transition-all shadow-sm"
             >
-              Chat on WhatsApp
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+              WA 1
+            </a>
+            <a
+              href={`https://wa.me/${cleanSecondaryWhatsapp}?text=Hello%20PixelForge%20Studio,%20I%20would%20like%20to%20discuss%20a%20project.`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#1C2833] bg-[#F4F6F6] rounded-full hover:bg-[#D5DBDB] transition-all shadow-sm"
+            >
+              <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+              WA 2
             </a>
           </div>
 
@@ -164,9 +176,20 @@ export default function Navbar({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-2.5 px-4 text-center text-xs font-semibold text-[#1C2833] bg-[#F4F6F6] rounded-lg"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all"
                 >
-                  Chat on WhatsApp
+                  <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                  Chat on WhatsApp — WA 1
+                </a>
+                <a
+                  href={`https://wa.me/${cleanSecondaryWhatsapp}?text=Hello%20PixelForge%20Studio,%20I%20would%20like%20to%20discuss%20a%20project.`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all"
+                >
+                  <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                  Chat on WhatsApp — WA 2
                 </a>
               </div>
             </div>
