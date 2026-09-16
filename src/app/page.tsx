@@ -30,7 +30,7 @@ export default async function HomePage() {
     tagline: "Your Ideas. Our Code. Real Solutions.",
     heroTitle: "Your Ideas.\nOur Code.\nReal Solutions.",
     heroDescription: "Custom digital solutions for businesses, shops, individuals and students.",
-    startingPrice: 15000,
+    startingPrice: 3000,
     primaryEmail: "keerthiadarshmp@gmail.com",
     secondaryEmail: "barathponnusamyy@gmail.com",
     primaryPhone: "+91 87789 79416",

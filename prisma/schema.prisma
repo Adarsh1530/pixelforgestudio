@@ -22,7 +22,7 @@ model SiteSettings {
   tagline        String   @default("Your Ideas. Our Code. Real Solutions.")
   heroTitle      String   @default("Your Ideas.\nOur Code.\nReal Solutions.")
   heroDescription String  @default("Custom digital solutions for businesses, shops, individuals and students.")
-  startingPrice  Int      @default(15000)
+  startingPrice  Int      @default(3000)
   primaryEmail   String   @default("keerthiadarshmp@gmail.com")
   secondaryEmail String   @default("barathponnusamyy@gmail.com")
   primaryPhone   String   @default("+91 87789 79416")

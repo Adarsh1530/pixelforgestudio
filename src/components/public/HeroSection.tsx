@@ -16,7 +16,7 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ settings }: HeroSectionProps) {
-  const startingPrice = settings?.startingPrice || 15000;
+  const startingPrice = settings?.startingPrice || 3000;
   const whatsappNumber = (settings?.whatsapp || "+91 87789 79416").replace(/[^0-9]/g, "");
   const secondaryWhatsappNumber = (settings?.secondaryWhatsapp || "+91 81248 44253").replace(/[^0-9]/g, "");
 

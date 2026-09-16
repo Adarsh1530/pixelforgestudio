@@ -10,7 +10,7 @@ export default function AdminContentPage() {
     tagline: "Your Ideas. Our Code. Real Solutions.",
     heroTitle: "Your Ideas.\nOur Code.\nReal Solutions.",
     heroDescription: "Custom digital solutions for businesses, shops, individuals and students.",
-    startingPrice: 15000,
+    startingPrice: 3000,
     footerText: "Let's turn your ideas into powerful solutions.",
   });
 
