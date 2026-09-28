@@ -161,7 +161,74 @@ async function main() {
   }
   console.log("Academic packages seeded.");
 
+  // Seed Portfolio Projects
+  const defaultPortfolio = [
+    {
+      title: "VMS PRO — Vehicle Management & Transport Software",
+      category: "Software",
+      description:
+        "Advanced vehicle management and transport software system built for fleet operators. Covers vehicle tracking, trip management, driver records, maintenance scheduling and detailed reporting — engineered for scale and reliability.",
+      image: "/images/logo.jpg",
+      technologies: "Next.js,Node.js,PostgreSQL,Prisma,Tailwind CSS",
+      projectUrl: "https://vmspro.in/",
+      githubUrl: null,
+      featured: true,
+      published: true,
+      sortOrder: 1,
+    },
+    {
+      title: "Bhavan's Vivekananda Vidya Mandir — School Website",
+      category: "Websites",
+      description:
+        "Complete institutional website for Bhavan's Vivekananda Vidya Mandir, Manvila, Thiruvananthapuram. Features school information, gallery, announcements, staff directory and admission details with a clean, professional design.",
+      image: "/images/logo.jpg",
+      technologies: "Next.js,Tailwind CSS,Vercel",
+      projectUrl: "https://bvb-manvila.vercel.app/",
+      githubUrl: null,
+      featured: true,
+      published: true,
+      sortOrder: 2,
+    },
+    {
+      title: "Wales Group — Corporate Business Website",
+      category: "Websites",
+      description:
+        "Corporate website for Wales Group, UAE. A premium business presence website for an international group company based in the Middle East — showcasing services, portfolio and contact information.",
+      image: "/images/logo.jpg",
+      technologies: "Next.js,Tailwind CSS,Vercel",
+      projectUrl: "https://walessgroup.ae/",
+      githubUrl: null,
+      featured: false,
+      published: true,
+      sortOrder: 3,
+    },
+    {
+      title: "Rosellsa Haute Beauty Sanctuary — Salon & Spa, Muscat",
+      category: "Websites",
+      description:
+        "Luxury salon and spa website for Rosellsa Haute Beauty Sanctuary, Muscat, Oman. Elegant, high-end design reflecting the premium brand identity — featuring services, gallery, booking info and contact details.",
+      image: "/images/logo.jpg",
+      technologies: "Next.js,Tailwind CSS,Vercel",
+      projectUrl: "https://rosellsa-haute-salon-spa.vercel.app/",
+      githubUrl: null,
+      featured: true,
+      published: true,
+      sortOrder: 4,
+    },
+  ];
+
+  for (const proj of defaultPortfolio) {
+    const existing = await prisma.portfolioProject.findFirst({
+      where: { title: proj.title },
+    });
+    if (!existing) {
+      await prisma.portfolioProject.create({ data: proj });
+    }
+  }
+  console.log("Portfolio projects seeded.");
+
   console.log("Seeding finished successfully.");
+
 }
 
 main()
