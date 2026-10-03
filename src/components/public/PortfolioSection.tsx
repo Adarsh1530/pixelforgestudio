@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ExternalLink, Github, Layers, Maximize2, X, ZoomIn } from "lucide-react";
+import { ExternalLink, Github, Layers, Maximize2, X } from "lucide-react";
 
 export interface PortfolioProjectItem {
   id: string;
@@ -154,17 +154,17 @@ export default function PortfolioSection({ projects }: PortfolioSectionProps) {
                       </div>
 
                       {/* Content */}
-                      <div className="p-6">
+                      <div className="p-6 pb-3">
                         <h3 className="text-lg font-bold text-[#F4F6F6] mb-2 group-hover:text-[#D5DBDB] transition-colors">
                           {project.title}
                         </h3>
-                        <p className="text-xs text-[#AAB7B8] leading-relaxed mb-4 line-clamp-3">
+                        <p className="text-xs text-[#AAB7B8] leading-relaxed mb-3 line-clamp-3">
                           {project.description}
                         </p>
 
                         {/* Tech Tags */}
                         {techList.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 mb-4">
+                          <div className="flex flex-wrap gap-1.5">
                             {techList.map((tech, i) => (
                               <span
                                 key={i}
@@ -179,7 +179,7 @@ export default function PortfolioSection({ projects }: PortfolioSectionProps) {
                     </div>
 
                     {/* Action Links */}
-                    <div className="p-6 pt-0 border-t border-[#2E4053] flex items-center justify-between gap-3 mt-4">
+                    <div className="px-6 pb-6 pt-0 flex items-center justify-between gap-3">
                       {project.projectUrl ? (
                         <a
                           href={project.projectUrl}
@@ -193,21 +193,6 @@ export default function PortfolioSection({ projects }: PortfolioSectionProps) {
                       ) : (
                         <span className="text-[10px] text-[#AAB7B8]">Internal System</span>
                       )}
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setPreviewImage({
-                            url: imgUrl,
-                            title: project.title,
-                            category: project.category,
-                          })
-                        }
-                        className="inline-flex items-center gap-1 text-xs text-[#AAB7B8] hover:text-[#F4F6F6] transition-colors"
-                      >
-                        <ZoomIn className="w-3.5 h-3.5" />
-                        <span>Full Size</span>
-                      </button>
 
                       {project.githubUrl && (
                         <a
