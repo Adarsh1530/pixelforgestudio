@@ -214,7 +214,7 @@ async function main() {
       category: "Websites",
       description:
         "Luxury salon and spa website for Rosellsa Haute Beauty Sanctuary, Muscat, Oman. Elegant, high-end design reflecting the premium brand identity — featuring services, gallery, booking info and contact details.",
-      image: "/images/logo.jpg",
+      image: "/images/projects/rosellsa.png",
       technologies: "Next.js,Tailwind CSS,Vercel",
       projectUrl: "https://rosellsa-haute-salon-spa.vercel.app/",
       githubUrl: null,
