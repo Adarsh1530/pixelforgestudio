@@ -175,7 +175,7 @@ async function main() {
       category: "Software",
       description:
         "Advanced vehicle management and transport software system built for fleet operators. Covers vehicle tracking, trip management, driver records, maintenance scheduling and detailed reporting — engineered for scale and reliability.",
-      image: "/images/logo.jpg",
+      image: "/images/projects/vmspro.jpg",
       technologies: "Next.js,Node.js,PostgreSQL,Prisma,Tailwind CSS",
       projectUrl: "https://vmspro.in/",
       githubUrl: null,
@@ -188,7 +188,7 @@ async function main() {
       category: "Websites",
       description:
         "Complete institutional website for Bhavan's Vivekananda Vidya Mandir, Manvila, Thiruvananthapuram. Features school information, gallery, announcements, staff directory and admission details with a clean, professional design.",
-      image: "/images/logo.jpg",
+      image: "/images/projects/bvb-manvila.png",
       technologies: "Next.js,Tailwind CSS,Vercel",
       projectUrl: "https://bvb-manvila.vercel.app/",
       githubUrl: null,
@@ -201,7 +201,7 @@ async function main() {
       category: "Websites",
       description:
         "Corporate website for Wales Group, UAE. A premium business presence website for an international group company based in the Middle East — showcasing services, portfolio and contact information.",
-      image: "/images/logo.jpg",
+      image: "/images/projects/walesgroup.jpg",
       technologies: "Next.js,Tailwind CSS,Vercel",
       projectUrl: "https://walessgroup.ae/",
       githubUrl: null,
@@ -230,6 +230,11 @@ async function main() {
     });
     if (!existing) {
       await prisma.portfolioProject.create({ data: proj });
+    } else {
+      await prisma.portfolioProject.update({
+        where: { id: existing.id },
+        data: { image: proj.image },
+      });
     }
   }
   console.log("Portfolio projects seeded.");
