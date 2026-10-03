@@ -66,15 +66,38 @@ export default function HeroSection({ settings }: HeroSectionProps) {
                 "Custom digital solutions for businesses, shops, individuals and students. Evolving bold concepts into high-performance software, modern mobile apps, and scalable web platforms."}
             </p>
 
-            {/* Starting Price Pill */}
-            <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-lg bg-[#2E4053]/50 border border-[#D5DBDB]/15 mb-8">
-              <Sparkles className="w-4 h-4 text-[#D5DBDB]" />
-              <span className="text-xs sm:text-sm text-[#AAB7B8]">
-                Professional Digital Solutions —{" "}
-                <span className="text-[#F4F6F6] font-bold">
-                  Starting from {formatCurrency(startingPrice)}
+            {/* Tailored Solutions Pricing Block */}
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-[#2E4053]/50 border border-[#D5DBDB]/15 mb-8 w-full max-w-xl backdrop-blur-sm">
+              <div className="flex items-center gap-2 mb-2.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#D5DBDB]" />
+                <span className="text-xs font-bold uppercase tracking-wider text-[#D5DBDB]">
+                  Tailored Solutions for Every Need
                 </span>
-              </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <a
+                  href="#academic"
+                  className="p-3 rounded-xl bg-[#1C2833]/80 border border-[#D5DBDB]/10 hover:border-[#D5DBDB]/30 transition-all flex flex-col justify-between group"
+                >
+                  <span className="text-xs font-semibold text-[#D5DBDB] group-hover:text-[#F4F6F6] transition-colors">
+                    Student Projects
+                  </span>
+                  <span className="text-xs text-[#AAB7B8] mt-1">
+                    Starting from <span className="text-[#F4F6F6] font-bold text-sm">₹3,000</span>
+                  </span>
+                </a>
+                <a
+                  href="#business-solutions"
+                  className="p-3 rounded-xl bg-[#1C2833]/80 border border-[#D5DBDB]/10 hover:border-[#D5DBDB]/30 transition-all flex flex-col justify-between group"
+                >
+                  <span className="text-xs font-semibold text-[#D5DBDB] group-hover:text-[#F4F6F6] transition-colors">
+                    Professional &amp; Client Projects
+                  </span>
+                  <span className="text-xs text-[#AAB7B8] mt-1">
+                    Starting from <span className="text-[#F4F6F6] font-bold text-sm">₹15,000</span>
+                  </span>
+                </a>
+              </div>
             </div>
 
             {/* CTAs */}
