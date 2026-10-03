@@ -71,11 +71,11 @@ export const SiteSettingsSchema = z.object({
   heroDescription: z.string().min(1, "Hero description is required."),
   startingPrice: z.number().positive("Starting price must be positive."),
   primaryEmail: z.string().email("Invalid primary email."),
-  secondaryEmail: z.string().email("Invalid secondary email."),
+  secondaryEmail: z.string().email("Invalid secondary email.").optional().or(z.literal("")),
   primaryPhone: z.string().min(5, "Primary phone is required."),
-  secondaryPhone: z.string().min(5, "Secondary phone is required."),
+  secondaryPhone: z.string().optional().or(z.literal("")),
   whatsapp: z.string().min(5, "WhatsApp number is required."),
-  secondaryWhatsapp: z.string().min(5, "Secondary WhatsApp number is required."),
+  secondaryWhatsapp: z.string().optional().or(z.literal("")),
   footerText: z.string().min(1, "Footer text is required."),
 });
 

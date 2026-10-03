@@ -24,7 +24,14 @@ async function main() {
   // Seed Site Settings
   await prisma.siteSettings.upsert({
     where: { id: "default" },
-    update: {},
+    update: {
+      primaryEmail: "keerthiadarshmp@gmail.com",
+      secondaryEmail: "",
+      primaryPhone: "+91 87789 79416",
+      secondaryPhone: "",
+      whatsapp: "+91 87789 79416",
+      secondaryWhatsapp: "",
+    },
     create: {
       id: "default",
       brandName: "PixelForge Studio",
@@ -33,11 +40,11 @@ async function main() {
       heroDescription: "Custom digital solutions for businesses, shops, individuals and students.",
       startingPrice: 3000,
       primaryEmail: "keerthiadarshmp@gmail.com",
-      secondaryEmail: "barathponnusamyy@gmail.com",
+      secondaryEmail: "",
       primaryPhone: "+91 87789 79416",
-      secondaryPhone: "+91 81248 44253",
+      secondaryPhone: "",
       whatsapp: "+91 87789 79416",
-      secondaryWhatsapp: "+91 81248 44253",
+      secondaryWhatsapp: "",
       footerText: "Let's turn your ideas into powerful solutions.",
     },
   });

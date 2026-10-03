@@ -32,11 +32,11 @@ export default async function HomePage() {
     heroDescription: "Custom digital solutions for businesses, shops, individuals and students.",
     startingPrice: 3000,
     primaryEmail: "keerthiadarshmp@gmail.com",
-    secondaryEmail: "barathponnusamyy@gmail.com",
+    secondaryEmail: "",
     primaryPhone: "+91 87789 79416",
-    secondaryPhone: "+91 81248 44253",
+    secondaryPhone: "",
     whatsapp: "+91 87789 79416",
-    secondaryWhatsapp: "+91 81248 44253",
+    secondaryWhatsapp: "",
     footerText: "Let's turn your ideas into powerful solutions.",
   };
 
@@ -45,7 +45,6 @@ export default async function HomePage() {
       <Navbar
         brandName={activeSettings.brandName}
         whatsappNumber={activeSettings.whatsapp}
-        secondaryWhatsapp={activeSettings.secondaryWhatsapp}
       />
 
       <HeroSection settings={activeSettings} />
@@ -55,13 +54,11 @@ export default async function HomePage() {
       <BusinessSolutionsSection
         startingPrice={activeSettings.startingPrice}
         whatsappNumber={activeSettings.whatsapp}
-        secondaryWhatsapp={activeSettings.secondaryWhatsapp}
       />
 
       <AcademicSection
         packages={packages}
         whatsappNumber={activeSettings.whatsapp}
-        secondaryWhatsapp={activeSettings.secondaryWhatsapp}
       />
 
       <PerksSection />
@@ -80,7 +77,6 @@ export default async function HomePage() {
 
       <WhatsAppWidget
         whatsappNumber={activeSettings.whatsapp}
-        secondaryWhatsapp={activeSettings.secondaryWhatsapp}
       />
     </main>
   );

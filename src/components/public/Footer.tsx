@@ -9,9 +9,7 @@ interface FooterProps {
     brandName?: string;
     tagline?: string;
     primaryEmail?: string;
-    secondaryEmail?: string;
     primaryPhone?: string;
-    secondaryPhone?: string;
     footerText?: string;
   };
 }
@@ -20,13 +18,10 @@ export default function Footer({ settings }: FooterProps) {
   const brandName = settings?.brandName || "PixelForge Studio";
   const tagline = settings?.tagline || "Your Ideas. Our Code. Real Solutions.";
   const primaryEmail = settings?.primaryEmail || "keerthiadarshmp@gmail.com";
-  const secondaryEmail = settings?.secondaryEmail || "barathponnusamyy@gmail.com";
   const primaryPhone = settings?.primaryPhone || "+91 87789 79416";
-  const secondaryPhone = settings?.secondaryPhone || "+91 81248 44253";
   const footerText = settings?.footerText || "Let's turn your ideas into powerful solutions.";
 
   const cleanPrimaryPhone = primaryPhone.replace(/[^0-9+]/g, "");
-  const cleanSecondaryPhone = secondaryPhone.replace(/[^0-9+]/g, "");
 
   return (
     <footer className="bg-[#1C2833] text-[#F4F6F6] pt-16 pb-12 border-t border-[#2E4053]">
@@ -108,28 +103,19 @@ export default function Footer({ settings }: FooterProps) {
               Contact Details
             </h4>
             <div className="space-y-3 text-xs text-[#D5DBDB]">
+              <p className="text-sm font-bold text-[#F4F6F6]">
+                KEERTHI ADARSH M P
+              </p>
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 text-[#AAB7B8]" />
                 <a href={`mailto:${primaryEmail}`} className="font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors">
                   {primaryEmail}
                 </a>
               </div>
-              <div className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-[#AAB7B8]" />
-                <a href={`mailto:${secondaryEmail}`} className="font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors">
-                  {secondaryEmail}
-                </a>
-              </div>
               <div className="flex items-center gap-2 pt-1">
                 <Phone className="w-3.5 h-3.5 text-[#AAB7B8]" />
                 <a href={`tel:${cleanPrimaryPhone}`} className="font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors">
                   {primaryPhone}
-                </a>
-              </div>
-              <div className="flex items-center gap-2">
-                <Phone className="w-3.5 h-3.5 text-[#AAB7B8]" />
-                <a href={`tel:${cleanSecondaryPhone}`} className="font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors">
-                  {secondaryPhone}
                 </a>
               </div>
             </div>

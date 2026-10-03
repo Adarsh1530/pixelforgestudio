@@ -7,16 +7,13 @@ import { formatCurrency } from "@/lib/utils";
 interface BusinessSolutionsProps {
   startingPrice?: number;
   whatsappNumber?: string;
-  secondaryWhatsapp?: string;
 }
 
 export default function BusinessSolutionsSection({
   startingPrice = 15000,
   whatsappNumber = "+91 87789 79416",
-  secondaryWhatsapp = "+91 81248 44253",
 }: BusinessSolutionsProps) {
   const cleanWhatsapp = whatsappNumber.replace(/[^0-9]/g, "");
-  const cleanSecondaryWhatsapp = secondaryWhatsapp.replace(/[^0-9]/g, "");
 
   const businessSolutions = [
     {
@@ -177,16 +174,7 @@ export default function BusinessSolutionsSection({
                       className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-xl transition-all shadow-sm"
                     >
                       <MessageSquare className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-                      <span>Enquire Solution WA 1</span>
-                    </a>
-                    <a
-                      href={`https://wa.me/${cleanSecondaryWhatsapp}?text=${encodeURIComponent(waMsg)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-xl transition-all shadow-sm"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-                      <span>Enquire Solution WA 2</span>
+                      <span>Enquire Solution</span>
                     </a>
                   </div>
                 </div>

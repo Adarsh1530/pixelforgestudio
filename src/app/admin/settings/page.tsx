@@ -7,11 +7,11 @@ import { Save, CheckCircle2, Phone, Mail, MessageSquare } from "lucide-react";
 export default function AdminSettingsPage() {
   const [formData, setFormData] = useState({
     primaryEmail: "keerthiadarshmp@gmail.com",
-    secondaryEmail: "barathponnusamyy@gmail.com",
+    secondaryEmail: "",
     primaryPhone: "+91 87789 79416",
-    secondaryPhone: "+91 81248 44253",
+    secondaryPhone: "",
     whatsapp: "+91 87789 79416",
-    secondaryWhatsapp: "+91 81248 44253",
+    secondaryWhatsapp: "",
   });
 
   const [loading, setLoading] = useState(true);
@@ -26,11 +26,11 @@ export default function AdminSettingsPage() {
         if (data && !data.error) {
           setFormData({
             primaryEmail: data.primaryEmail || "keerthiadarshmp@gmail.com",
-            secondaryEmail: data.secondaryEmail || "barathponnusamyy@gmail.com",
+            secondaryEmail: data.secondaryEmail || "",
             primaryPhone: data.primaryPhone || "+91 87789 79416",
-            secondaryPhone: data.secondaryPhone || "+91 81248 44253",
+            secondaryPhone: data.secondaryPhone || "",
             whatsapp: data.whatsapp || "+91 87789 79416",
-            secondaryWhatsapp: data.secondaryWhatsapp || "+91 81248 44253",
+            secondaryWhatsapp: data.secondaryWhatsapp || "",
           });
         }
       } catch (err) {
@@ -99,11 +99,10 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-[#AAB7B8] mb-1 font-semibold uppercase tracking-wider">
-                Secondary Email Address
+                Secondary Email Address (Optional)
               </label>
               <input
                 type="email"
-                required
                 value={formData.secondaryEmail}
                 onChange={(e) => setFormData({ ...formData, secondaryEmail: e.target.value })}
                 className="w-full p-3 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-[#F4F6F6]"
@@ -127,11 +126,10 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-[#AAB7B8] mb-1 font-semibold uppercase tracking-wider">
-                Secondary Phone Number
+                Secondary Phone Number (Optional)
               </label>
               <input
                 type="text"
-                required
                 value={formData.secondaryPhone}
                 onChange={(e) => setFormData({ ...formData, secondaryPhone: e.target.value })}
                 className="w-full p-3 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-[#F4F6F6]"
@@ -155,11 +153,10 @@ export default function AdminSettingsPage() {
 
             <div>
               <label className="block text-[#AAB7B8] mb-1 font-semibold uppercase tracking-wider">
-                Secondary WhatsApp Number
+                Secondary WhatsApp Number (Optional)
               </label>
               <input
                 type="text"
-                required
                 value={formData.secondaryWhatsapp}
                 onChange={(e) => setFormData({ ...formData, secondaryWhatsapp: e.target.value })}
                 className="w-full p-3 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-[#F4F6F6]"

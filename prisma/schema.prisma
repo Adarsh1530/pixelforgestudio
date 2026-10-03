@@ -24,11 +24,11 @@ model SiteSettings {
   heroDescription String  @default("Custom digital solutions for businesses, shops, individuals and students.")
   startingPrice  Int      @default(3000)
   primaryEmail   String   @default("keerthiadarshmp@gmail.com")
-  secondaryEmail String   @default("barathponnusamyy@gmail.com")
+  secondaryEmail String   @default("")
   primaryPhone   String   @default("+91 87789 79416")
-  secondaryPhone String   @default("+91 81248 44253")
+  secondaryPhone String   @default("")
   whatsapp       String   @default("+91 87789 79416")
-  secondaryWhatsapp String @default("+91 81248 44253")
+  secondaryWhatsapp String @default("")
   footerText     String   @default("Let's turn your ideas into powerful solutions.")
   updatedAt      DateTime @updatedAt
 }

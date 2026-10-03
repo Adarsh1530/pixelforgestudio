@@ -2,16 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Mail, Phone, MessageSquare, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { Mail, Phone, MessageSquare, Send, CheckCircle2, AlertCircle, User } from "lucide-react";
 
 interface ContactSectionProps {
   settings?: {
     primaryEmail?: string;
-    secondaryEmail?: string;
     primaryPhone?: string;
-    secondaryPhone?: string;
     whatsapp?: string;
-    secondaryWhatsapp?: string;
   };
 }
 
@@ -19,16 +16,11 @@ export default function ContactSection({ settings }: ContactSectionProps) {
   const searchParams = useSearchParams();
 
   const primaryEmail = settings?.primaryEmail || "keerthiadarshmp@gmail.com";
-  const secondaryEmail = settings?.secondaryEmail || "barathponnusamyy@gmail.com";
   const primaryPhone = settings?.primaryPhone || "+91 87789 79416";
-  const secondaryPhone = settings?.secondaryPhone || "+91 81248 44253";
   const whatsappNumber = settings?.whatsapp || "+91 87789 79416";
-  const secondaryWhatsapp = settings?.secondaryWhatsapp || "+91 81248 44253";
 
   const cleanPrimaryPhone = primaryPhone.replace(/[^0-9+]/g, "");
-  const cleanSecondaryPhone = secondaryPhone.replace(/[^0-9+]/g, "");
   const cleanWhatsapp = whatsappNumber.replace(/[^0-9]/g, "");
-  const cleanSecondaryWhatsapp = secondaryWhatsapp.replace(/[^0-9]/g, "");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -143,51 +135,18 @@ export default function ContactSection({ settings }: ContactSectionProps) {
               {/* Direct Contact Cards */}
               <div className="space-y-4">
                 
-                {/* Email Box */}
+                {/* Lead Contact Person Box */}
                 <div className="bg-[#1C2833] p-5 rounded-2xl border border-[#D5DBDB]/15 flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-[#2E4053] text-[#D5DBDB] flex items-center justify-center shrink-0">
-                    <Mail className="w-5 h-5" />
+                    <User className="w-5 h-5" />
                   </div>
                   <div>
                     <h4 className="text-xs font-mono uppercase tracking-wider text-[#AAB7B8] mb-1">
-                      Email Us
+                      Lead Contact
                     </h4>
-                    <a
-                      href={`mailto:${primaryEmail}`}
-                      className="block text-sm font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors"
-                    >
-                      {primaryEmail}
-                    </a>
-                    <a
-                      href={`mailto:${secondaryEmail}`}
-                      className="block text-sm font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors mt-1"
-                    >
-                      {secondaryEmail}
-                    </a>
-                  </div>
-                </div>
-
-                {/* Phone Box */}
-                <div className="bg-[#1C2833] p-5 rounded-2xl border border-[#D5DBDB]/15 flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#2E4053] text-[#D5DBDB] flex items-center justify-center shrink-0">
-                    <Phone className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-mono uppercase tracking-wider text-[#AAB7B8] mb-1">
-                      Call Us
-                    </h4>
-                    <a
-                      href={`tel:${cleanPrimaryPhone}`}
-                      className="block text-sm font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors"
-                    >
-                      {primaryPhone}
-                    </a>
-                    <a
-                      href={`tel:${cleanSecondaryPhone}`}
-                      className="block text-sm font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors mt-1"
-                    >
-                      {secondaryPhone}
-                    </a>
+                    <p className="text-sm font-bold text-[#F4F6F6]">
+                      KEERTHI ADARSH M P
+                    </p>
                   </div>
                 </div>
 
@@ -208,13 +167,41 @@ export default function ContactSection({ settings }: ContactSectionProps) {
                     >
                       Chat on WhatsApp ({whatsappNumber})
                     </a>
+                  </div>
+                </div>
+
+                {/* Email Box */}
+                <div className="bg-[#1C2833] p-5 rounded-2xl border border-[#D5DBDB]/15 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#2E4053] text-[#D5DBDB] flex items-center justify-center shrink-0">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-[#AAB7B8] mb-1">
+                      Email Address
+                    </h4>
                     <a
-                      href={`https://wa.me/${cleanSecondaryWhatsapp}?text=Hello%20PixelForge%20Studio,%20I%20would%20like%20to%20discuss%20a%20project.`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors mt-1"
+                      href={`mailto:${primaryEmail}`}
+                      className="block text-sm font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors"
                     >
-                      Chat on WhatsApp ({secondaryWhatsapp})
+                      {primaryEmail}
+                    </a>
+                  </div>
+                </div>
+
+                {/* Phone Box */}
+                <div className="bg-[#1C2833] p-5 rounded-2xl border border-[#D5DBDB]/15 flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#2E4053] text-[#D5DBDB] flex items-center justify-center shrink-0">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-mono uppercase tracking-wider text-[#AAB7B8] mb-1">
+                      Call Us
+                    </h4>
+                    <a
+                      href={`tel:${cleanPrimaryPhone}`}
+                      className="block text-sm font-bold text-[#F4F6F6] hover:text-[#D5DBDB] transition-colors"
+                    >
+                      {primaryPhone}
                     </a>
                   </div>
                 </div>

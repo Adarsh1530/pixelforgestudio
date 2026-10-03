@@ -16,16 +16,13 @@ export interface AcademicPackageItem {
 interface AcademicSectionProps {
   packages: AcademicPackageItem[];
   whatsappNumber?: string;
-  secondaryWhatsapp?: string;
 }
 
 export default function AcademicSection({
   packages,
   whatsappNumber = "+91 87789 79416",
-  secondaryWhatsapp = "+91 81248 44253",
 }: AcademicSectionProps) {
   const cleanWhatsapp = whatsappNumber.replace(/[^0-9]/g, "");
-  const cleanSecondaryWhatsapp = secondaryWhatsapp.replace(/[^0-9]/g, "");
 
   const bcaPackages = packages.filter((p) => p.category === "BCA");
   const mcaPackages = packages.filter((p) => p.category === "MCA");
@@ -132,16 +129,7 @@ export default function AcademicSection({
                           className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all shadow-sm"
                         >
                           <MessageSquare className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-                          <span>Enquire Project WA 1</span>
-                        </a>
-                        <a
-                          href={`https://wa.me/${cleanSecondaryWhatsapp}?text=${encodeURIComponent(waMessage)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all shadow-sm"
-                        >
-                          <MessageSquare className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-                          <span>Enquire Project WA 2</span>
+                          <span>Enquire Project</span>
                         </a>
                       </div>
                     </div>
@@ -213,16 +201,7 @@ export default function AcademicSection({
                           className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all shadow-sm"
                         >
                           <MessageSquare className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-                          <span>Enquire Project WA 1</span>
-                        </a>
-                        <a
-                          href={`https://wa.me/${cleanSecondaryWhatsapp}?text=${encodeURIComponent(waMessage)}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all shadow-sm"
-                        >
-                          <MessageSquare className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
-                          <span>Enquire Project WA 2</span>
+                          <span>Enquire Project</span>
                         </a>
                       </div>
                     </div>
