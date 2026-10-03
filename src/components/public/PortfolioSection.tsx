@@ -46,10 +46,10 @@ export default function PortfolioSection({ projects }: PortfolioSectionProps) {
             PORTFOLIO SHOWCASE
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#F4F6F6] tracking-tight mt-3 mb-4">
-            Selected Work
+            WORKS &amp; PROJECTS
           </h2>
           <p className="text-base text-[#D5DBDB]/90">
-            A selection of custom software, mobile apps, and business websites engineered by PixelForge Studio.
+            A selection of websites, software, and digital solutions developed for businesses, organizations, and academic projects.
           </p>
         </div>
 

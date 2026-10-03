@@ -56,7 +56,7 @@ export default function Navbar({
     { name: "Business Solutions", href: "#business-solutions", id: "business-solutions" },
     { name: "Academic Projects", href: "#academic", id: "academic" },
     { name: "Process", href: "#process", id: "process" },
-    { name: "Selected Work", href: "#portfolio", id: "portfolio" },
+    { name: "Works & Projects", href: "#portfolio", id: "portfolio" },
     { name: "Why PixelForge", href: "#why-us", id: "why-us" },
     { name: "Contact", href: "#contact", id: "contact" },
   ];

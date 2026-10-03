@@ -85,7 +85,7 @@ export default function Footer({ settings }: FooterProps) {
                 <a href="#process" className="hover:text-[#F4F6F6] transition-colors">Process</a>
               </li>
               <li>
-                <a href="#portfolio" className="hover:text-[#F4F6F6] transition-colors">Selected Work</a>
+                <a href="#portfolio" className="hover:text-[#F4F6F6] transition-colors">Works &amp; Projects</a>
               </li>
               <li>
                 <a href="#why-us" className="hover:text-[#F4F6F6] transition-colors">Why PixelForge</a>

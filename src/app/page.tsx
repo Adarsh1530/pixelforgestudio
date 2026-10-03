@@ -7,7 +7,6 @@ import AcademicSection from "@/components/public/AcademicSection";
 import PerksSection from "@/components/public/PerksSection";
 import ProcessSection from "@/components/public/ProcessSection";
 import PortfolioSection from "@/components/public/PortfolioSection";
-import TestimonialsSection from "@/components/public/TestimonialsSection";
 import WhyUsSection from "@/components/public/WhyUsSection";
 import ContactSection from "@/components/public/ContactSection";
 import WhatsAppWidget from "@/components/public/WhatsAppWidget";
@@ -17,12 +16,11 @@ export const revalidate = 0; // Ensure fresh data from database on requests
 
 export default async function HomePage() {
   // Fetch dynamic content from DB
-  const [settings, services, packages, projects, testimonials] = await Promise.all([
+  const [settings, services, packages, projects] = await Promise.all([
     prisma.siteSettings.findUnique({ where: { id: "default" } }),
     prisma.service.findMany({ where: { published: true }, orderBy: { sortOrder: "asc" } }),
     prisma.academicPackage.findMany({ where: { published: true }, orderBy: { sortOrder: "asc" } }),
     prisma.portfolioProject.findMany({ where: { published: true }, orderBy: { sortOrder: "asc" } }),
-    prisma.testimonial.findMany({ where: { published: true }, orderBy: { createdAt: "desc" } }),
   ]);
 
   const activeSettings = settings || {
@@ -69,8 +67,6 @@ export default async function HomePage() {
       <ProcessSection />
 
       <PortfolioSection projects={projects} />
-
-      <TestimonialsSection testimonials={testimonials} />
 
       <WhyUsSection />
 
