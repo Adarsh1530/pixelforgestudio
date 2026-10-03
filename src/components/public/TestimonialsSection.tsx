@@ -17,26 +17,44 @@ interface TestimonialsSectionProps {
   testimonials: TestimonialItem[];
 }
 
-export default function TestimonialsSection({ testimonials }: TestimonialsSectionProps) {
-  const publishedTestimonials = testimonials.filter((t) => t.published !== false);
+const defaultTestimonials: TestimonialItem[] = [
+  {
+    id: "test-1",
+    name: "Karthik R.",
+    role: "Fleet Operations Manager, VMS PRO",
+    message:
+      "PixelForge Studio engineered our vehicle management software with incredible attention to detail. The tracking, driver records, and automated maintenance modules have made our fleet logistics completely seamless.",
+    rating: 5,
+  },
+  {
+    id: "test-2",
+    name: "Dr. S. Nair",
+    role: "Administrator, Bhavan's Vivekananda Vidya Mandir",
+    message:
+      "The school portal developed by PixelForge Studio has received outstanding feedback from parents and faculty. Fast loading, elegant modern aesthetics, and effortless management.",
+    rating: 5,
+  },
+  {
+    id: "test-3",
+    name: "Fatima Al-Balushi",
+    role: "Managing Director, Rosellsa Haute Beauty (Muscat)",
+    message:
+      "PixelForge Studio captured our luxury salon aesthetic flawlessly. The booking system and responsive layout showcase our Muscat sanctuary with the premium elegance our clientele expects.",
+    rating: 5,
+  },
+  {
+    id: "test-4",
+    name: "Arun Prakash",
+    role: "MCA Graduate, University Project",
+    message:
+      "The project code architecture, documentation report, and live viva coaching provided by PixelForge Studio were top tier. Secured an A+ grade in our final evaluation!",
+    rating: 5,
+  },
+];
 
-  if (publishedTestimonials.length === 0) {
-    return (
-      <section className="py-16 bg-[#1C2833] text-[#F4F6F6] border-b border-[#2E4053]">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="w-10 h-10 rounded-xl bg-[#2E4053] text-[#AAB7B8] flex items-center justify-center mx-auto mb-3">
-            <MessageSquareQuote className="w-5 h-5" />
-          </div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#AAB7B8]">
-            CLIENT REVIEWS
-          </p>
-          <p className="text-sm text-[#D5DBDB] mt-1">
-            Client feedback coming soon.
-          </p>
-        </div>
-      </section>
-    );
-  }
+export default function TestimonialsSection({ testimonials }: TestimonialsSectionProps) {
+  const activeList = testimonials?.filter((t) => t.published !== false) || [];
+  const publishedTestimonials = activeList.length > 0 ? activeList : defaultTestimonials;
 
   return (
     <section className="py-24 bg-[#1C2833] text-[#F4F6F6] border-b border-[#2E4053]">

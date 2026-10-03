@@ -49,7 +49,10 @@ export default async function HomePage() {
 
       <HeroSection settings={activeSettings} />
 
-      <ServicesSection services={services} />
+      <ServicesSection
+        services={services}
+        whatsappNumber={activeSettings.whatsapp}
+      />
 
       <BusinessSolutionsSection
         startingPrice={activeSettings.startingPrice}

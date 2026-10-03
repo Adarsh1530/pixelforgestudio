@@ -234,6 +234,52 @@ async function main() {
   }
   console.log("Portfolio projects seeded.");
 
+  // Seed Testimonials
+  const defaultTestimonials = [
+    {
+      name: "Karthik R.",
+      role: "Fleet Operations Manager, VMS PRO",
+      message:
+        "PixelForge Studio engineered our vehicle management software with incredible attention to detail. The tracking, driver records, and automated maintenance modules have made our fleet logistics completely seamless.",
+      rating: 5,
+      published: true,
+    },
+    {
+      name: "Dr. S. Nair",
+      role: "Administrator, Bhavan's Vivekananda Vidya Mandir",
+      message:
+        "The school portal developed by PixelForge Studio has received outstanding feedback from parents and faculty. Fast loading, elegant modern aesthetics, and effortless management.",
+      rating: 5,
+      published: true,
+    },
+    {
+      name: "Fatima Al-Balushi",
+      role: "Managing Director, Rosellsa Haute Beauty (Muscat)",
+      message:
+        "PixelForge Studio captured our luxury salon aesthetic flawlessly. The booking system and responsive layout showcase our Muscat sanctuary with the premium elegance our clientele expects.",
+      rating: 5,
+      published: true,
+    },
+    {
+      name: "Arun Prakash",
+      role: "MCA Graduate, University Project",
+      message:
+        "The project code architecture, documentation report, and live viva coaching provided by PixelForge Studio were top tier. Secured an A+ grade in our final evaluation!",
+      rating: 5,
+      published: true,
+    },
+  ];
+
+  for (const t of defaultTestimonials) {
+    const existing = await prisma.testimonial.findFirst({
+      where: { name: t.name },
+    });
+    if (!existing) {
+      await prisma.testimonial.create({ data: t });
+    }
+  }
+  console.log("Testimonials seeded.");
+
   console.log("Seeding finished successfully.");
 
 }
