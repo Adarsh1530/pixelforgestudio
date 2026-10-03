@@ -190,7 +190,7 @@ async function main() {
         "Complete institutional website for Bhavan's Vivekananda Vidya Mandir, Manvila, Thiruvananthapuram. Features school information, gallery, announcements, staff directory and admission details with a clean, professional design.",
       image: "/images/projects/bvb-manvila.png",
       technologies: "Next.js,Tailwind CSS,Vercel",
-      projectUrl: "https://bvb-manvila.vercel.app/",
+      projectUrl: "https://vmspro.sparkitts.com/",
       githubUrl: null,
       featured: true,
       published: true,
@@ -233,7 +233,10 @@ async function main() {
     } else {
       await prisma.portfolioProject.update({
         where: { id: existing.id },
-        data: { image: proj.image },
+        data: {
+          image: proj.image,
+          projectUrl: proj.projectUrl,
+        },
       });
     }
   }
