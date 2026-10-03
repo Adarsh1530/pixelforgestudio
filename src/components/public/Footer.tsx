@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import { Mail, Phone, Lock } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 
 interface FooterProps {
   settings?: {
@@ -126,14 +125,6 @@ export default function Footer({ settings }: FooterProps) {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#AAB7B8]">
           <p>© 2026 PixelForge Studio. All rights reserved.</p>
-
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-1 text-[11px] text-[#AAB7B8]/60 hover:text-[#F4F6F6] transition-colors"
-          >
-            <Lock className="w-3 h-3" />
-            Admin Portal
-          </Link>
         </div>
 
       </div>
