@@ -208,7 +208,7 @@ export default function AdminTestimonialsPage() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Barath Ponnusamy"
+                    placeholder="e.g. Rajesh Kumar"
                     className="w-full p-2.5 rounded-xl bg-[#2E4053] border border-[#D5DBDB]/20 text-[#F4F6F6]"
                   />
                 </div>
