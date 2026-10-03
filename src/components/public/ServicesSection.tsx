@@ -182,17 +182,17 @@ export default function ServicesSection({
     : null;
 
   return (
-    <section id="services" className="py-24 bg-[#F4F6F6] text-[#1C2833] border-b border-[#D5DBDB]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="services" className="py-24 bg-[#2E4053] text-[#F4F6F6] border-b border-[#1C2833] relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#2E4053] bg-[#D5DBDB]/50 px-3 py-1 rounded-full">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#D5DBDB] bg-[#1C2833] px-3.5 py-1 rounded-full border border-[#D5DBDB]/15">
             WHAT WE BUILD
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1C2833] tracking-tight mt-3 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#F4F6F6] tracking-tight mt-3 mb-4">
             Custom Development Services
           </h2>
-          <p className="text-base text-[#2E4053]/80">
+          <p className="text-base text-[#D5DBDB]/90">
             High-performance technology, design, and tailored software built around your ideas.
           </p>
         </div>

@@ -38,17 +38,17 @@ export default function PerksSection() {
   ];
 
   return (
-    <section className="py-20 bg-[#F4F6F6] text-[#1C2833] border-b border-[#D5DBDB]">
+    <section className="py-20 bg-[#2E4053] text-[#F4F6F6] border-b border-[#1C2833]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#2E4053] bg-[#D5DBDB]/60 px-3 py-1 rounded-full">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#D5DBDB] bg-[#1C2833] px-3.5 py-1 rounded-full border border-[#D5DBDB]/15">
             ALL PACKAGES INCLUDE
           </span>
-          <h2 className="text-3xl font-extrabold text-[#1C2833] tracking-tight mt-3 mb-2">
+          <h2 className="text-3xl font-extrabold text-[#F4F6F6] tracking-tight mt-3 mb-2">
             Everything You Need
           </h2>
-          <p className="text-sm text-[#2E4053]/80">
+          <p className="text-sm text-[#D5DBDB]/90">
             Complete end-to-end deliverables included in every academic project package.
           </p>
         </div>
@@ -63,7 +63,7 @@ export default function PerksSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: idx * 0.08 }}
-                className="bg-[#1C2833] text-[#F4F6F6] rounded-2xl p-6 border border-[#2E4053] hover:border-[#AAB7B8] transition-all flex flex-col justify-between"
+                className="bg-[#1C2833] text-[#F4F6F6] rounded-2xl p-6 border border-[#D5DBDB]/15 hover:border-[#AAB7B8] transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="w-10 h-10 rounded-xl bg-[#2E4053] text-[#D5DBDB] flex items-center justify-center mb-4">

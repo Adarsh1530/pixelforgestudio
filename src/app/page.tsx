@@ -41,7 +41,7 @@ export default async function HomePage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F4F6F6] text-[#1C2833] font-sans antialiased selection:bg-[#2E4053] selection:text-[#F4F6F6]">
+    <main className="min-h-screen bg-[#1C2833] text-[#F4F6F6] font-sans antialiased selection:bg-[#2E4053] selection:text-[#F4F6F6]">
       <Navbar
         brandName={activeSettings.brandName}
         whatsappNumber={activeSettings.whatsapp}

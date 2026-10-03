@@ -37,18 +37,18 @@ export default function PortfolioSection({ projects }: PortfolioSectionProps) {
         );
 
   return (
-    <section id="portfolio" className="py-24 bg-[#F4F6F6] text-[#1C2833] border-b border-[#D5DBDB]">
+    <section id="portfolio" className="py-24 bg-[#2E4053] text-[#F4F6F6] border-b border-[#1C2833]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#2E4053] bg-[#D5DBDB]/50 px-3 py-1 rounded-full">
+          <span className="text-xs font-bold uppercase tracking-widest text-[#D5DBDB] bg-[#1C2833] px-3.5 py-1 rounded-full border border-[#D5DBDB]/15">
             PORTFOLIO SHOWCASE
           </span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#1C2833] tracking-tight mt-3 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#F4F6F6] tracking-tight mt-3 mb-4">
             Selected Work
           </h2>
-          <p className="text-base text-[#2E4053]/80">
+          <p className="text-base text-[#D5DBDB]/90">
             A selection of custom software, mobile apps, and business websites engineered by PixelForge Studio.
           </p>
         </div>
@@ -61,8 +61,8 @@ export default function PortfolioSection({ projects }: PortfolioSectionProps) {
               onClick={() => setActiveCategory(cat)}
               className={`px-4 py-2 rounded-full text-xs font-bold transition-all duration-200 ${
                 activeCategory === cat
-                  ? "bg-[#1C2833] text-[#F4F6F6] shadow-md"
-                  : "bg-[#D5DBDB]/40 text-[#2E4053] hover:bg-[#D5DBDB] hover:text-[#1C2833]"
+                  ? "bg-[#1C2833] text-[#F4F6F6] shadow-md border border-[#D5DBDB]/30"
+                  : "bg-[#1C2833]/50 text-[#D5DBDB] hover:bg-[#1C2833] hover:text-[#F4F6F6] border border-[#D5DBDB]/10"
               }`}
             >
               {cat}
