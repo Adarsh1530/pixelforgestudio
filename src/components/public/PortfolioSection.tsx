@@ -132,24 +132,24 @@ export default function PortfolioSection({ projects }: PortfolioSectionProps) {
                             category: project.category,
                           })
                         }
-                        className="relative aspect-[16/10] w-full bg-[#1C2833] overflow-hidden cursor-pointer"
-                        title="Click to view full size image"
+                        className="relative aspect-[16/10] w-full bg-[#151D24] border-b border-[#2E4053] overflow-hidden cursor-pointer flex items-center justify-center"
+                        title="Click to view full size logo"
                       >
                         <Image
                           src={imgUrl}
                           alt={project.title}
                           fill
                           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                          className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                          className="object-contain p-3.5 sm:p-4 group-hover:scale-105 transition-transform duration-300"
                         />
                         <div className="absolute top-3 left-3 bg-[#1C2833]/90 text-[#F4F6F6] text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md border border-[#D5DBDB]/20 z-10">
                           {project.category}
                         </div>
 
                         {/* Hover Overlay with Expand Hint */}
-                        <div className="absolute inset-0 bg-[#1C2833]/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-bold text-[#F4F6F6] backdrop-blur-[2px]">
+                        <div className="absolute inset-0 bg-[#1C2833]/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-bold text-[#F4F6F6] backdrop-blur-[2px]">
                           <Maximize2 className="w-4 h-4 text-emerald-400" />
-                          <span>View Full Image</span>
+                          <span>View Full Logo</span>
                         </div>
                       </div>
 
