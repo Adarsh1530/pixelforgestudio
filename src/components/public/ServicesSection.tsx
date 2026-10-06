@@ -182,7 +182,7 @@ export default function ServicesSection({
     : null;
 
   return (
-    <section id="services" className="py-24 bg-[#2E4053] text-[#F4F6F6] border-b border-[#1C2833] relative overflow-hidden">
+    <section id="services" className="py-24 bg-[#2E4053] text-[#F4F6F6] border-b border-[#1C2833] relative overflow-hidden scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">

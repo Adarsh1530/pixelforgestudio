@@ -83,7 +83,7 @@ export default function BusinessSolutionsSection({
   ];
 
   return (
-    <section id="business-solutions" className="py-24 bg-[#1C2833] text-[#F4F6F6] border-b border-[#2E4053] relative overflow-hidden">
+    <section id="business-solutions" className="py-24 bg-[#1C2833] text-[#F4F6F6] border-b border-[#2E4053] relative overflow-hidden scroll-mt-24">
       {/* Background Accent Grid */}
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />
 

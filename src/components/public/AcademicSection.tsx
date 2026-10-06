@@ -42,7 +42,7 @@ export default function AcademicSection({
   };
 
   return (
-    <section id="academic" className="py-24 bg-[#1C2833] text-[#F4F6F6] border-b border-[#2E4053] relative overflow-hidden">
+    <section id="academic" className="py-24 bg-[#1C2833] text-[#F4F6F6] border-b border-[#2E4053] relative overflow-hidden scroll-mt-24">
       {/* Background Accent Lines */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
 

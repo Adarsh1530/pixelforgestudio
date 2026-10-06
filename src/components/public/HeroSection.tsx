@@ -21,7 +21,7 @@ export default function HeroSection({ settings }: HeroSectionProps) {
   return (
     <section
       id="hero"
-      className="relative min-h-screen pt-32 pb-20 bg-[#1C2833] text-[#F4F6F6] flex items-center overflow-hidden border-b border-[#2E4053]"
+      className="relative min-h-screen pt-32 pb-20 bg-[#1C2833] text-[#F4F6F6] flex items-center overflow-hidden border-b border-[#2E4053] scroll-mt-24"
     >
       {/* Background Subtle Grid */}
       <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none" />

@@ -28,7 +28,7 @@ export default function WhyUsSection() {
   ];
 
   return (
-    <section id="why-us" className="py-24 bg-[#1C2833] text-[#F4F6F6] border-b border-[#2E4053] relative">
+    <section id="why-us" className="py-24 bg-[#1C2833] text-[#F4F6F6] border-b border-[#2E4053] relative scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">

@@ -56,7 +56,7 @@ export default function PortfolioSection({ projects }: PortfolioSectionProps) {
         );
 
   return (
-    <section id="portfolio" className="py-24 bg-[#2E4053] text-[#F4F6F6] border-b border-[#1C2833]">
+    <section id="portfolio" className="py-24 bg-[#2E4053] text-[#F4F6F6] border-b border-[#1C2833] scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header */}

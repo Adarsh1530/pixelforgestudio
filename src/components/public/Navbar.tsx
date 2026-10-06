@@ -29,12 +29,13 @@ export default function Navbar({
 
       // Detect active section
       const sections = ["hero", "services", "business-solutions", "academic", "process", "portfolio", "why-us", "contact"];
-      const scrollPosition = window.scrollY + 200;
+      const scrollPosition = window.scrollY + 120;
 
       for (const section of sections) {
         const el = document.getElementById(section);
         if (el) {
-          const top = el.offsetTop;
+          const rect = el.getBoundingClientRect();
+          const top = rect.top + window.scrollY;
           const height = el.offsetHeight;
           if (scrollPosition >= top && scrollPosition < top + height) {
             setActiveSection(section);
@@ -44,7 +45,7 @@ export default function Navbar({
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -61,18 +62,60 @@ export default function Navbar({
     { name: "Contact", href: "#contact", id: "contact" },
   ];
 
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    e.preventDefault();
+    const targetId = href.replace(/^#/, "");
+
+    // Immediately close the mobile menu drawer
+    setMobileMenuOpen(false);
+    setActiveSection(targetId);
+
+    // Give a brief tick (60ms) to let drawer close smoothly without interrupting scroll
+    setTimeout(() => {
+      if (targetId === "hero") {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      } else {
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          const headerHeight = 75;
+          const rect = targetElement.getBoundingClientRect();
+          const targetY = rect.top + window.scrollY - headerHeight;
+
+          window.scrollTo({
+            top: Math.max(0, targetY),
+            behavior: "smooth",
+          });
+        }
+      }
+
+      if (typeof window !== "undefined" && window.history && window.history.pushState) {
+        window.history.pushState(null, "", href);
+      }
+    }, 60);
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-[#1C2833]/90 backdrop-blur-md shadow-lg border-b border-[#2E4053] py-3"
+        isScrolled || mobileMenuOpen
+          ? "bg-[#1C2833]/95 backdrop-blur-md shadow-lg border-b border-[#2E4053] py-3"
           : "bg-transparent py-5"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="#hero" className="flex items-center gap-3 group">
+          <Link
+            href="#hero"
+            onClick={(e) => handleNavClick(e, "#hero")}
+            className="flex items-center gap-3 group"
+          >
             <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-[#D5DBDB]/20 bg-[#1C2833] flex items-center justify-center group-hover:border-[#AAB7B8] transition-colors">
               <Image
                 src="/images/logo.png"
@@ -99,7 +142,8 @@ export default function Navbar({
               <a
                 key={link.id}
                 href={link.href}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ${
+                onClick={(e) => handleNavClick(e, link.href)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-all duration-200 cursor-pointer ${
                   activeSection === link.id
                     ? "text-[#F4F6F6] bg-[#2E4053]"
                     : "text-[#AAB7B8] hover:text-[#F4F6F6] hover:bg-[#2E4053]/50"
@@ -141,18 +185,19 @@ export default function Navbar({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-[#1C2833] border-b border-[#2E4053] px-4 pt-3 pb-6 mt-3 shadow-xl"
+            transition={{ duration: 0.2 }}
+            className="md:hidden bg-[#1C2833] border-b border-[#2E4053] px-4 pt-3 pb-6 mt-3 shadow-2xl max-h-[calc(100vh-80px)] overflow-y-auto"
           >
             <div className="flex flex-col gap-2">
               {navLinks.map((link) => (
                 <a
                   key={link.id}
                   href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={(e) => handleNavClick(e, link.href)}
+                  className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors cursor-pointer text-left block w-full ${
                     activeSection === link.id
-                      ? "bg-[#2E4053] text-[#F4F6F6]"
-                      : "text-[#AAB7B8] hover:bg-[#2E4053]/50 hover:text-[#F4F6F6]"
+                      ? "bg-[#2E4053] text-[#F4F6F6] font-semibold"
+                      : "text-[#D5DBDB] hover:bg-[#2E4053]/60 hover:text-[#F4F6F6] active:bg-[#2E4053]"
                   }`}
                 >
                   {link.name}
@@ -164,7 +209,7 @@ export default function Navbar({
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] rounded-lg transition-all"
                 >
                   <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
                   Chat on WhatsApp
