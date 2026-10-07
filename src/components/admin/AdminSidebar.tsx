@@ -22,13 +22,17 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
 
+  if (pathname === "/admin/login") {
+    return null;
+  }
+
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/admin/login");
-      router.refresh();
+      window.location.replace("/admin/login");
     } catch (err) {
       console.error("Logout error:", err);
+      window.location.replace("/admin/login");
     }
   };
 

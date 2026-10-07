@@ -16,24 +16,39 @@ export async function POST(request: Request) {
     }
 
     const { email, password } = result.data;
+    const normalizedEmail = email.toLowerCase().trim();
 
-    const user = await prisma.adminUser.findUnique({
-      where: { email },
+    const user = await prisma.adminUser.findFirst({
+      where: {
+        email: {
+          equals: normalizedEmail,
+          mode: "insensitive",
+        },
+      },
     });
 
     if (!user) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
     const isValid = await verifyPassword(password, user.passwordHash);
     if (!isValid) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
     const token = await signToken({ userId: user.id, email: user.email });
     await setAuthCookie(token);
 
-    return NextResponse.json({ success: true, message: "Logged in successfully" });
+    const response = NextResponse.json({ success: true, message: "Logged in successfully" });
+    response.cookies.set("pf_admin_session", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24, // 24 hours
+    });
+
+    return response;
   } catch (error) {
     console.error("Login API Error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

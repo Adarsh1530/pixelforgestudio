@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Lock, Mail, ArrowRight, AlertCircle } from "lucide-react";
+import { Lock, Mail, ArrowRight, AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -17,24 +16,35 @@ export default function AdminLoginPage() {
     setStatus("submitting");
     setErrorMsg("");
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15-second fail-safe timeout
+
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim(), password }),
+        signal: controller.signal,
       });
 
-      const data = await res.json();
+      clearTimeout(timeoutId);
+
+      const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        throw new Error(data?.error || "Invalid credentials.");
+        throw new Error(data?.error || "Invalid email or password.");
       }
 
-      router.push("/admin");
-      router.refresh();
+      // Hard redirect ensures the browser commits the session cookie and navigates immediately
+      window.location.replace("/admin");
     } catch (err: any) {
+      clearTimeout(timeoutId);
       setStatus("error");
-      setErrorMsg(err?.message || "Login failed. Please check your credentials.");
+      if (err.name === "AbortError") {
+        setErrorMsg("Connection timed out. Please check your network and try again.");
+      } else {
+        setErrorMsg(err?.message || "Login failed. Please check your credentials.");
+      }
     }
   };
 
@@ -79,6 +89,7 @@ export default function AdminLoginPage() {
               <input
                 type="email"
                 required
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@pixelforge.studio"
@@ -94,23 +105,35 @@ export default function AdminLoginPage() {
             <div className="relative">
               <Lock className="w-4 h-4 text-[#AAB7B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6] placeholder-[#AAB7B8]/40 focus:outline-none focus:border-[#D5DBDB] transition-colors"
+                className="w-full pl-10 pr-10 py-3 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6] placeholder-[#AAB7B8]/40 focus:outline-none focus:border-[#D5DBDB] transition-colors"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#AAB7B8] hover:text-[#F4F6F6] transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
           <button
             type="submit"
             disabled={status === "submitting"}
-            className="w-full py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] disabled:opacity-50 transition-all shadow-lg flex items-center justify-center gap-2 mt-6"
+            className="w-full py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] disabled:opacity-50 transition-all shadow-lg flex items-center justify-center gap-2 mt-6 cursor-pointer"
           >
             {status === "submitting" ? (
-              <span>Authenticating...</span>
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-[#1C2833]" />
+                <span>Authenticating...</span>
+              </>
             ) : (
               <>
                 <span>Sign In to Admin</span>

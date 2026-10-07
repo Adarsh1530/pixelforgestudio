@@ -26,16 +26,18 @@ export default async function AdminDashboardOverview() {
     testimonialsCount,
     recentEnquiries,
   ] = await Promise.all([
-    prisma.enquiry.count(),
-    prisma.enquiry.count({ where: { status: "NEW" } }),
-    prisma.service.count({ where: { published: true } }),
-    prisma.academicPackage.count({ where: { published: true } }),
-    prisma.portfolioProject.count({ where: { published: true } }),
-    prisma.testimonial.count({ where: { published: true } }),
-    prisma.enquiry.findMany({
-      take: 6,
-      orderBy: { createdAt: "desc" },
-    }),
+    prisma.enquiry.count().catch(() => 0),
+    prisma.enquiry.count({ where: { status: "NEW" } }).catch(() => 0),
+    prisma.service.count({ where: { published: true } }).catch(() => 0),
+    prisma.academicPackage.count({ where: { published: true } }).catch(() => 0),
+    prisma.portfolioProject.count({ where: { published: true } }).catch(() => 0),
+    prisma.testimonial.count({ where: { published: true } }).catch(() => 0),
+    prisma.enquiry
+      .findMany({
+        take: 6,
+        orderBy: { createdAt: "desc" },
+      })
+      .catch(() => []),
   ]);
 
   const stats = [

@@ -11,12 +11,22 @@ const AUTH_COOKIE_NAME = "pf_admin_session";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow login page & auth API routes
-  if (
-    pathname === "/admin/login" ||
-    pathname.startsWith("/api/auth/") ||
-    pathname === "/api/enquiries"
-  ) {
+  // If already logged in, redirect away from /admin/login to /admin
+  if (pathname === "/admin/login") {
+    const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
+    if (token) {
+      try {
+        await jwtVerify(token, JWT_SECRET);
+        return NextResponse.redirect(new URL("/admin", request.url));
+      } catch {
+        // Invalid token, proceed to login page
+      }
+    }
+    return NextResponse.next();
+  }
+
+  // Allow auth API routes & public enquiries
+  if (pathname.startsWith("/api/auth/") || pathname === "/api/enquiries") {
     return NextResponse.next();
   }
 
