@@ -14,14 +14,13 @@ import {
   XCircle,
   Clock,
   Sparkles,
-  ExternalLink,
-  ChevronRight,
-  ShieldCheck,
   Lock,
   LogOut,
   AlertCircle,
+  ArrowRight,
   Eye,
   EyeOff,
+  Loader2,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -50,8 +49,8 @@ function playAlertChime() {
     const gain = ctx.createGain();
 
     osc.type = "sine";
-    osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1); // A5
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+    osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
 
     gain.gain.setValueAtTime(0.3, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
@@ -69,13 +68,11 @@ function playAlertChime() {
 // Trigger native device vibration
 function triggerDeviceVibration() {
   if (typeof window !== "undefined") {
-    // Check for native Android bridge
     const bridge = (window as unknown as { AndroidBridge?: { vibrate: (ms: number) => void } }).AndroidBridge;
     if (bridge?.vibrate) {
       bridge.vibrate(300);
       return;
     }
-    // Standard web vibration
     if (navigator.vibrate) {
       navigator.vibrate([200, 100, 200]);
     }
@@ -137,7 +134,6 @@ export default function MobileAdminPage() {
       }
       setAuthChecked(true);
 
-      // Request browser notification permission if available
       if ("Notification" in window && Notification.permission === "default") {
         Notification.requestPermission();
       }
@@ -153,12 +149,12 @@ export default function MobileAdminPage() {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+        body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok || !data.success) {
-        setLoginError(data.error || "Invalid login credentials");
+        setLoginError(data?.error || "Invalid email or password.");
         setLoginLoading(false);
         return;
       }
@@ -194,15 +190,13 @@ export default function MobileAdminPage() {
       const data = await res.json();
 
       if (Array.isArray(data)) {
-        // Detect new pending enquiries for sound & vibration alert
         const currentPendingIds = new Set(
-          data.filter((e: EnquiryItem) => e.status === "PENDING").map((e: EnquiryItem) => e.id)
+          data.filter((e: EnquiryItem) => e.status === "PENDING" || e.status === "NEW").map((e: EnquiryItem) => e.id)
         );
 
         if (initialLoadDoneRef.current) {
-          // Check if any new pending ID appeared that wasn't in previous set
           const newPendingItems = data.filter(
-            (e: EnquiryItem) => e.status === "PENDING" && !previousPendingIdsRef.current.has(e.id)
+            (e: EnquiryItem) => (e.status === "PENDING" || e.status === "NEW") && !previousPendingIdsRef.current.has(e.id)
           );
 
           if (newPendingItems.length > 0) {
@@ -304,7 +298,6 @@ export default function MobileAdminPage() {
         }),
       });
 
-      // Update local state
       setEnquiries((prev) =>
         prev.map((e) =>
           e.id === selectedEnquiry.id ? { ...e, status: newStatus, notes: updatedNotes } : e
@@ -312,7 +305,6 @@ export default function MobileAdminPage() {
       );
       setSelectedEnquiry((prev) => (prev ? { ...prev, status: newStatus, notes: updatedNotes } : null));
 
-      // Clean phone number for WhatsApp deep link
       let cleanPhone = selectedEnquiry.phone.replace(/[^0-9]/g, "");
       if (cleanPhone.length === 10) {
         cleanPhone = `91${cleanPhone}`;
@@ -321,7 +313,6 @@ export default function MobileAdminPage() {
       const encodedMessage = encodeURIComponent(decisionMessage);
       const waUrl = `https://wa.me/${cleanPhone}?text=${encodedMessage}`;
 
-      // Check if native Android bridge has direct WhatsApp opener
       const bridge = (window as unknown as { AndroidBridge?: { openWhatsApp: (p: string, m: string) => void } }).AndroidBridge;
       if (bridge?.openWhatsApp) {
         bridge.openWhatsApp(cleanPhone, decisionMessage);
@@ -335,8 +326,7 @@ export default function MobileAdminPage() {
     }
   };
 
-  // Filtered Enquiries
-  const pendingCount = enquiries.filter((e) => e.status === "PENDING").length;
+  const pendingCount = enquiries.filter((e) => e.status === "PENDING" || e.status === "NEW").length;
 
   const filteredEnquiries = enquiries.filter((item) => {
     const matchesTab =
@@ -359,64 +349,83 @@ export default function MobileAdminPage() {
 
   if (!authChecked) {
     return (
-      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center text-white">
-        <RefreshCw className="w-8 h-8 animate-spin text-teal-400" />
+      <div className="min-h-screen bg-[#1C2833] flex items-center justify-center text-[#F4F6F6]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#D5DBDB]" />
       </div>
     );
   }
 
-  // Login Screen if not authenticated
+  // Exact Match to Desktop Admin Login Styling
   if (!authToken) {
     return (
-      <div className="min-h-screen bg-[#0B132B] flex flex-col items-center justify-center px-4 py-8">
-        <div className="w-full max-w-sm bg-[#1A252F] border border-[#2E4053] rounded-3xl p-6 shadow-2xl space-y-6 text-white">
-          <div className="text-center space-y-2">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-teal-400 to-indigo-600 flex items-center justify-center p-2.5 shadow-lg shadow-teal-500/20">
-              <ShieldCheck className="w-9 h-9 text-white" />
+      <div className="min-h-screen bg-[#1C2833] flex flex-col items-center justify-center p-4 antialiased font-sans">
+        <div className="w-full max-w-sm bg-[#2E4053]/50 border border-[#D5DBDB]/15 rounded-3xl p-6 backdrop-blur-md shadow-2xl space-y-6">
+          {/* Header Logo */}
+          <div className="text-center">
+            <div className="relative w-14 h-14 rounded-2xl overflow-hidden border border-[#D5DBDB]/20 bg-[#1C2833] flex items-center justify-center mx-auto mb-3 shadow-lg">
+              <Image
+                src="/images/logo.png"
+                alt="PixelForge Studio"
+                width={56}
+                height={56}
+                className="object-contain p-1"
+                priority
+              />
             </div>
-            <h1 className="text-xl font-bold tracking-tight">PixelForge Admin</h1>
-            <p className="text-xs text-[#AAB7B8]">Mobile Enquiry Management App</p>
+            <h1 className="text-xl font-extrabold text-[#F4F6F6] tracking-tight">
+              PIXELFORGE ADMIN
+            </h1>
+            <p className="text-xs text-[#AAB7B8] mt-1">
+              Enquiry Management App
+            </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             {loginError && (
-              <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
+              <div className="bg-rose-950/80 border border-rose-500/30 rounded-xl p-3 flex items-center gap-2.5 text-xs text-rose-200">
+                <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
                 <span>{loginError}</span>
               </div>
             )}
 
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-semibold text-[#AAB7B8] uppercase tracking-wider">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#AAB7B8] mb-1.5">
                 Admin Email
               </label>
-              <input
-                type="email"
-                required
-                placeholder="Enter admin email"
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-[#0F172A] border border-[#2E4053] text-sm text-white focus:outline-none focus:border-teal-400"
-              />
+              <div className="relative">
+                <Mail className="w-4 h-4 text-[#AAB7B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  placeholder="admin@pixelforge.studio"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6] placeholder-[#AAB7B8]/40 focus:outline-none focus:border-[#D5DBDB] transition-colors"
+                />
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-[11px] font-semibold text-[#AAB7B8] uppercase tracking-wider">
-                Admin Password
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-[#AAB7B8] mb-1.5">
+                Password
               </label>
               <div className="relative">
+                <Lock className="w-4 h-4 text-[#AAB7B8] absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type={showPassword ? "text" : "password"}
                   required
-                  placeholder="Enter admin password"
+                  autoComplete="current-password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-[#0F172A] border border-[#2E4053] text-sm text-white focus:outline-none focus:border-teal-400"
+                  placeholder="••••••••••••"
+                  className="w-full pl-10 pr-10 py-3 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6] placeholder-[#AAB7B8]/40 focus:outline-none focus:border-[#D5DBDB] transition-colors"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-3 text-[#AAB7B8] hover:text-white transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#AAB7B8] hover:text-[#F4F6F6] transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -426,9 +435,19 @@ export default function MobileAdminPage() {
             <button
               type="submit"
               disabled={loginLoading}
-              className="w-full py-3 rounded-xl font-bold text-sm bg-gradient-to-r from-teal-400 to-emerald-500 text-[#0F172A] hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50"
+              className="w-full py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider text-[#1C2833] bg-[#F4F6F6] hover:bg-[#D5DBDB] disabled:opacity-50 transition-all shadow-lg flex items-center justify-center gap-2 mt-6 cursor-pointer"
             >
-              {loginLoading ? "Authenticating..." : "Unlock Admin App"}
+              {loginLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin text-[#1C2833]" />
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In to Admin</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
         </div>
@@ -437,20 +456,28 @@ export default function MobileAdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B132B] text-[#F4F6F6] pb-24 flex flex-col font-sans">
-      {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-[#1A252F]/95 backdrop-blur-md border-b border-[#2E4053] px-4 py-3 shadow-md">
+    <div className="min-h-screen bg-[#1C2833] text-[#F4F6F6] pb-24 flex flex-col font-sans antialiased">
+      {/* Top Header - Matching Desktop Admin Navbar */}
+      <header className="sticky top-0 z-40 bg-[#1C2833]/95 backdrop-blur-md border-b border-[#2E4053] px-4 py-3 shadow-md">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-teal-400/20 border border-teal-400/30 flex items-center justify-center">
-              <span className="text-teal-300 font-extrabold text-sm">PF</span>
+          <div className="flex items-center gap-3">
+            <div className="relative w-8 h-8 rounded-lg overflow-hidden border border-[#D5DBDB]/20 bg-[#1C2833] flex items-center justify-center">
+              <Image
+                src="/images/logo.png"
+                alt="PixelForge Admin"
+                width={32}
+                height={32}
+                className="object-contain p-0.5"
+              />
             </div>
             <div>
-              <h1 className="text-sm font-bold leading-tight flex items-center gap-1.5">
-                PixelForge Admin
+              <div className="font-extrabold text-sm tracking-tight text-[#F4F6F6] leading-none flex items-center gap-1.5">
+                <span>PIXEL<span className="text-[#AAB7B8]">FORGE</span></span>
                 <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              </h1>
-              <span className="text-[10px] text-[#AAB7B8]">Live Enquiries Hub</span>
+              </div>
+              <span className="text-[10px] tracking-widest text-[#AAB7B8] uppercase block mt-0.5">
+                ENQUIRY HUB
+              </span>
             </div>
           </div>
 
@@ -462,28 +489,28 @@ export default function MobileAdminPage() {
                 if (!soundEnabled) playAlertChime();
               }}
               title={soundEnabled ? "Alert Sound On" : "Alert Sound Muted"}
-              className={`p-2 rounded-lg border transition-colors ${
+              className={`p-2 rounded-xl border transition-colors ${
                 soundEnabled
-                  ? "bg-teal-400/10 border-teal-400/30 text-teal-300"
-                  : "bg-[#2E4053] border-transparent text-[#AAB7B8]"
+                  ? "bg-[#2E4053] border-[#D5DBDB]/20 text-[#F4F6F6]"
+                  : "bg-[#1C2833] border-[#2E4053] text-[#AAB7B8]"
               }`}
             >
-              {soundEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+              {soundEnabled ? <Bell className="w-4 h-4 text-amber-300" /> : <BellOff className="w-4 h-4" />}
             </button>
 
             {/* Manual Refresh */}
             <button
               onClick={() => fetchEnquiries(false)}
               disabled={refreshing || loading}
-              className="p-2 rounded-lg bg-[#2E4053] text-[#AAB7B8] hover:text-white transition-colors"
+              className="p-2 rounded-xl bg-[#2E4053] border border-[#D5DBDB]/10 text-[#AAB7B8] hover:text-[#F4F6F6] transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin text-teal-400" : ""}`} />
+              <RefreshCw className={`w-4 h-4 ${refreshing ? "animate-spin text-[#F4F6F6]" : ""}`} />
             </button>
 
             {/* Logout */}
             <button
               onClick={handleLogout}
-              className="p-2 rounded-lg bg-rose-950/40 border border-rose-500/20 text-rose-300 hover:text-white transition-colors"
+              className="p-2 rounded-xl bg-rose-950/40 border border-rose-500/20 text-rose-300 hover:text-white transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -494,33 +521,27 @@ export default function MobileAdminPage() {
         <div className="mt-3 relative">
           <input
             type="text"
-            placeholder="Search client, phone, service..."
+            placeholder="Search client, phone, service, budget..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#0F172A] border border-[#2E4053] text-xs text-white placeholder-[#7F8C8D] focus:outline-none focus:border-teal-400"
+            className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/15 text-xs text-[#F4F6F6] placeholder-[#AAB7B8]/50 focus:outline-none focus:border-[#D5DBDB] transition-colors"
           />
-          <Search className="w-3.5 h-3.5 text-[#7F8C8D] absolute left-3 top-2.5" />
+          <Search className="w-3.5 h-3.5 text-[#AAB7B8] absolute left-3 top-3" />
         </div>
 
         {/* Filter Tabs */}
         <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
           <button
             onClick={() => setActiveTab("PENDING")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
               activeTab === "PENDING"
-                ? "bg-amber-400 text-[#0F172A] shadow-md shadow-amber-400/20"
-                : "bg-[#2E4053]/60 text-[#AAB7B8]"
+                ? "bg-[#2E4053] text-[#F4F6F6] border border-[#D5DBDB]/30 shadow-sm"
+                : "bg-[#1C2833] border border-[#2E4053] text-[#AAB7B8]"
             }`}
           >
             <span>Pending</span>
             {pendingCount > 0 && (
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                  activeTab === "PENDING"
-                    ? "bg-[#0F172A] text-amber-300"
-                    : "bg-amber-400 text-[#0F172A] animate-pulse"
-                }`}
-              >
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-amber-400 text-[#1C2833] animate-pulse">
                 {pendingCount}
               </span>
             )}
@@ -528,10 +549,10 @@ export default function MobileAdminPage() {
 
           <button
             onClick={() => setActiveTab("ALL")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
               activeTab === "ALL"
-                ? "bg-teal-400 text-[#0F172A] shadow-md shadow-teal-400/20"
-                : "bg-[#2E4053]/60 text-[#AAB7B8]"
+                ? "bg-[#2E4053] text-[#F4F6F6] border border-[#D5DBDB]/30 shadow-sm"
+                : "bg-[#1C2833] border border-[#2E4053] text-[#AAB7B8]"
             }`}
           >
             All ({enquiries.length})
@@ -539,10 +560,10 @@ export default function MobileAdminPage() {
 
           <button
             onClick={() => setActiveTab("ACCEPTED")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
               activeTab === "ACCEPTED"
-                ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                : "bg-[#2E4053]/60 text-[#AAB7B8]"
+                ? "bg-emerald-600 text-white shadow-sm"
+                : "bg-[#1C2833] border border-[#2E4053] text-[#AAB7B8]"
             }`}
           >
             Accepted
@@ -550,10 +571,10 @@ export default function MobileAdminPage() {
 
           <button
             onClick={() => setActiveTab("REJECTED")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
               activeTab === "REJECTED"
-                ? "bg-rose-500 text-white shadow-md shadow-rose-500/20"
-                : "bg-[#2E4053]/60 text-[#AAB7B8]"
+                ? "bg-rose-600 text-white shadow-sm"
+                : "bg-[#1C2833] border border-[#2E4053] text-[#AAB7B8]"
             }`}
           >
             Rejected
@@ -561,17 +582,17 @@ export default function MobileAdminPage() {
         </div>
       </header>
 
-      {/* Main Content Area */}
+      {/* Main Enquiries Content */}
       <main className="flex-1 px-4 py-3 space-y-3">
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center space-y-2 text-[#AAB7B8]">
-            <RefreshCw className="w-7 h-7 animate-spin text-teal-400" />
+            <Loader2 className="w-7 h-7 animate-spin text-[#F4F6F6]" />
             <p className="text-xs">Fetching client enquiries...</p>
           </div>
         ) : filteredEnquiries.length === 0 ? (
-          <div className="py-16 text-center space-y-3 bg-[#1A252F]/40 border border-[#2E4053]/50 rounded-2xl p-6">
-            <CheckCircle2 className="w-10 h-10 text-teal-400 mx-auto" />
-            <h3 className="text-sm font-bold text-white">No Enquiries Found</h3>
+          <div className="py-16 text-center space-y-3 bg-[#2E4053]/30 border border-[#D5DBDB]/10 rounded-2xl p-6">
+            <CheckCircle2 className="w-10 h-10 text-emerald-400 mx-auto" />
+            <h3 className="text-sm font-bold text-[#F4F6F6]">No Enquiries Found</h3>
             <p className="text-xs text-[#AAB7B8]">
               {activeTab === "PENDING"
                 ? "All caught up! No pending enquiries waiting for response."
@@ -586,23 +607,23 @@ export default function MobileAdminPage() {
             return (
               <div
                 key={enq.id}
-                className={`bg-[#1A252F] border rounded-2xl p-4 transition-all space-y-3 ${
+                className={`bg-[#2E4053]/40 border rounded-2xl p-4 transition-all space-y-3 ${
                   isPending
-                    ? "border-amber-400/40 shadow-lg shadow-amber-400/5 ring-1 ring-amber-400/20"
+                    ? "border-amber-400/50 shadow-lg shadow-amber-400/5 ring-1 ring-amber-400/20"
                     : enq.status === "ACCEPTED"
                     ? "border-emerald-500/30"
                     : enq.status === "REJECTED"
                     ? "border-rose-500/30"
-                    : "border-[#2E4053]"
+                    : "border-[#D5DBDB]/10"
                 }`}
               >
                 {/* Header: Name, Time, Status */}
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h2 className="font-bold text-sm text-white flex items-center gap-2">
+                    <h2 className="font-bold text-sm text-[#F4F6F6] flex items-center gap-2">
                       {enq.name}
                       {isPending && (
-                        <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-400 text-[#0F172A] uppercase animate-pulse">
+                        <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-amber-400 text-[#1C2833] uppercase animate-pulse">
                           Pending
                         </span>
                       )}
@@ -624,18 +645,18 @@ export default function MobileAdminPage() {
                   </div>
 
                   {/* Budget Badge */}
-                  <span className="px-2 py-0.5 rounded-lg bg-[#2E4053] text-teal-300 text-[10px] font-bold tracking-tight shrink-0">
+                  <span className="px-2.5 py-1 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/15 text-[#F4F6F6] text-[11px] font-bold tracking-tight shrink-0 font-mono">
                     {enq.budget}
                   </span>
                 </div>
 
                 {/* Service Tag */}
-                <div className="inline-block px-2.5 py-1 rounded-md bg-teal-950/40 border border-teal-400/20 text-teal-300 text-xs font-semibold">
+                <div className="inline-block px-2.5 py-1 rounded-lg bg-[#1C2833] border border-[#D5DBDB]/15 text-[#D5DBDB] text-xs font-semibold">
                   🛠️ {enq.service}
                 </div>
 
                 {/* Description */}
-                <div className="bg-[#0F172A] rounded-xl p-3 border border-[#2E4053]/60 text-xs text-[#E5E7EB] leading-relaxed">
+                <div className="bg-[#1C2833] rounded-xl p-3 border border-[#D5DBDB]/10 text-xs text-[#D5DBDB] leading-relaxed">
                   {enq.description || "No project description provided."}
                 </div>
 
@@ -643,7 +664,7 @@ export default function MobileAdminPage() {
                 <div className="flex items-center gap-2 pt-1">
                   <a
                     href={`tel:${enq.phone}`}
-                    className="flex-1 py-1.5 px-2 rounded-xl bg-[#2E4053]/50 hover:bg-[#2E4053] text-[11px] font-medium text-white flex items-center justify-center gap-1.5 transition-colors border border-[#2E4053]"
+                    className="flex-1 py-2 px-2.5 rounded-xl bg-[#1C2833] hover:bg-[#2E4053] text-[11px] font-medium text-[#F4F6F6] flex items-center justify-center gap-1.5 transition-colors border border-[#D5DBDB]/10"
                   >
                     <Phone className="w-3 h-3 text-emerald-400" />
                     <span className="truncate">{enq.phone}</span>
@@ -651,7 +672,7 @@ export default function MobileAdminPage() {
 
                   <a
                     href={`mailto:${enq.email}`}
-                    className="flex-1 py-1.5 px-2 rounded-xl bg-[#2E4053]/50 hover:bg-[#2E4053] text-[11px] font-medium text-white flex items-center justify-center gap-1.5 transition-colors border border-[#2E4053]"
+                    className="flex-1 py-2 px-2.5 rounded-xl bg-[#1C2833] hover:bg-[#2E4053] text-[11px] font-medium text-[#F4F6F6] flex items-center justify-center gap-1.5 transition-colors border border-[#D5DBDB]/10"
                   >
                     <Mail className="w-3 h-3 text-sky-400" />
                     <span className="truncate">{enq.email}</span>
@@ -659,16 +680,16 @@ export default function MobileAdminPage() {
                 </div>
 
                 {/* Workflow Buttons: ACCEPT & REJECT */}
-                <div className="pt-2 border-t border-[#2E4053]/60 space-y-2.5">
+                <div className="pt-2 border-t border-[#D5DBDB]/10 space-y-2.5">
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => {
                         handleSelectEnquiry(enq);
                         handleTriggerDecision("ACCEPT");
                       }}
-                      className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                      className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
                         isSelected && decisionMode === "ACCEPT"
-                          ? "bg-emerald-500 text-white ring-2 ring-emerald-400"
+                          ? "bg-emerald-600 text-white ring-2 ring-emerald-400"
                           : "bg-emerald-950/60 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-900/60"
                       }`}
                     >
@@ -681,9 +702,9 @@ export default function MobileAdminPage() {
                         handleSelectEnquiry(enq);
                         handleTriggerDecision("REJECT");
                       }}
-                      className={`flex-1 py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
+                      className={`flex-1 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all ${
                         isSelected && decisionMode === "REJECT"
-                          ? "bg-rose-500 text-white ring-2 ring-rose-400"
+                          ? "bg-rose-600 text-white ring-2 ring-rose-400"
                           : "bg-rose-950/60 text-rose-300 border border-rose-500/30 hover:bg-rose-900/60"
                       }`}
                     >
@@ -692,12 +713,12 @@ export default function MobileAdminPage() {
                     </button>
                   </div>
 
-                  {/* Pre-filled WhatsApp Response Box when ACCEPT / REJECT is active */}
+                  {/* Pre-filled WhatsApp Response Box */}
                   {isSelected && decisionMode && (
-                    <div className="p-3 rounded-xl bg-[#0F172A] border border-teal-500/30 space-y-2.5 animate-in fade-in duration-200">
+                    <div className="p-3.5 rounded-2xl bg-[#1C2833] border border-[#D5DBDB]/20 space-y-2.5 animate-in fade-in duration-200 shadow-xl">
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-bold text-teal-300 flex items-center gap-1">
-                          <Sparkles className="w-3 h-3" />
+                        <span className="text-[11px] font-bold text-[#F4F6F6] flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3 text-amber-300" />
                           Pre-filled {decisionMode} WhatsApp Response
                         </span>
                         <span className="text-[10px] text-[#AAB7B8]">Editable</span>
@@ -707,13 +728,13 @@ export default function MobileAdminPage() {
                         rows={6}
                         value={decisionMessage}
                         onChange={(e) => setDecisionMessage(e.target.value)}
-                        className="w-full p-2.5 rounded-lg bg-[#1A252F] border border-[#2E4053] text-xs text-white leading-relaxed focus:outline-none focus:border-teal-400"
+                        className="w-full p-2.5 rounded-xl bg-[#2E4053]/50 border border-[#D5DBDB]/15 text-xs text-[#F4F6F6] leading-relaxed focus:outline-none focus:border-[#D5DBDB]"
                       />
 
                       <button
                         onClick={handleSendWhatsApp}
                         disabled={submittingDecision}
-                        className="w-full py-2.5 rounded-xl font-bold text-xs bg-emerald-500 text-white hover:bg-emerald-600 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                        className="w-full py-3 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white active:scale-95 transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 disabled:opacity-50"
                       >
                         <Send className="w-3.5 h-3.5" />
                         <span>
@@ -722,7 +743,7 @@ export default function MobileAdminPage() {
                             : "📱 Open WhatsApp (Pre-filled)"}
                         </span>
                       </button>
-                      <p className="text-[9px] text-center text-[#7F8C8D]">
+                      <p className="text-[9px] text-center text-[#AAB7B8]">
                         Status will update to {decisionMode === "ACCEPT" ? "Accepted" : "Rejected"} & WhatsApp will open with message ready.
                       </p>
                     </div>
