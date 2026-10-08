@@ -33,6 +33,8 @@ export default function ContactSection({ settings }: ContactSectionProps) {
 
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [submittedWhatsAppUrl, setSubmittedWhatsAppUrl] = useState("");
+  const [submittedClientName, setSubmittedClientName] = useState("");
 
   useEffect(() => {
     const serviceParam = searchParams.get("service");
@@ -62,6 +64,19 @@ export default function ContactSection({ settings }: ContactSectionProps) {
     setStatus("submitting");
     setErrorMessage("");
 
+    // Prepare WhatsApp prefilled message
+    const adminWhatsApp = cleanWhatsapp || "918778979416";
+    const clientWaText =
+      `Hello Keerthi Adarsh, I just submitted an enquiry on PixelForge Studio:\n\n` +
+      `• Name: ${formData.name}\n` +
+      `• Service: ${formData.service}\n` +
+      `• Budget: ${formData.budget}\n` +
+      `• Phone: ${formData.phone}\n` +
+      `• Email: ${formData.email}\n` +
+      (formData.description ? `• Details: ${formData.description}` : "");
+
+    const fallbackWaUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(clientWaText)}`;
+
     try {
       const res = await fetch("/api/enquiries", {
         method: "POST",
@@ -75,7 +90,18 @@ export default function ContactSection({ settings }: ContactSectionProps) {
         throw new Error(data?.error || "Failed to submit enquiry.");
       }
 
+      const waUrl = data?.whatsappUrl || fallbackWaUrl;
+      setSubmittedWhatsAppUrl(waUrl);
+      setSubmittedClientName(formData.name);
       setStatus("success");
+
+      // Attempt to open WhatsApp directly for immediate chat
+      try {
+        window.open(waUrl, "_blank");
+      } catch {
+        // Popups might be blocked on some browsers; user can tap button directly
+      }
+
       setFormData({
         name: "",
         email: "",
@@ -221,20 +247,37 @@ export default function ContactSection({ settings }: ContactSectionProps) {
               </p>
 
               {status === "success" ? (
-                <div className="bg-emerald-950/80 border border-emerald-500/30 rounded-2xl p-6 text-center">
+                <div className="bg-emerald-950/80 border border-emerald-500/30 rounded-2xl p-6 sm:p-8 text-center">
                   <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-                  <h4 className="text-lg font-bold text-emerald-200 mb-1">
-                    Enquiry Received!
+                  <h4 className="text-xl font-bold text-[#F4F6F6] mb-1">
+                    Enquiry Submitted Successfully!
                   </h4>
-                  <p className="text-xs text-emerald-300/90 leading-relaxed mb-4">
-                    Thank you! Your project details have been received. We will get back to you shortly via WhatsApp or Email.
+                  <p className="text-xs text-[#D5DBDB] leading-relaxed mb-6 max-w-md mx-auto">
+                    {submittedClientName ? `Thank you, ${submittedClientName}! ` : "Thank you! "}
+                    Your project details have been recorded. You can now chat directly with <strong className="text-[#F4F6F6]">Keerthi Adarsh</strong> on WhatsApp with all your enquiry details ready.
                   </p>
-                  <button
-                    onClick={() => setStatus("idle")}
-                    className="px-4 py-2 text-xs font-bold text-[#1C2833] bg-[#F4F6F6] rounded-lg hover:bg-[#D5DBDB] transition-colors"
-                  >
-                    Send Another Enquiry
-                  </button>
+
+                  <div className="space-y-3 max-w-sm mx-auto">
+                    {submittedWhatsAppUrl && (
+                      <a
+                        href={submittedWhatsAppUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl text-xs font-bold uppercase tracking-wider text-[#1C2833] bg-[#25D366] hover:bg-[#20ba59] transition-all shadow-lg shadow-emerald-950/50"
+                      >
+                        <MessageSquare className="w-4 h-4 fill-current" />
+                        <span>Chat with Keerthi Adarsh on WhatsApp</span>
+                      </a>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => setStatus("idle")}
+                      className="w-full py-2.5 px-4 text-xs font-semibold text-[#AAB7B8] hover:text-[#F4F6F6] transition-colors cursor-pointer"
+                    >
+                      ← Submit Another Enquiry
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4">
