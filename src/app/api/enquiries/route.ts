@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         budget: result.data.budget,
         description: result.data.description,
         source: result.data.source || "WEBSITE",
-        status: "NEW",
+        status: "PENDING",
       },
     });
 

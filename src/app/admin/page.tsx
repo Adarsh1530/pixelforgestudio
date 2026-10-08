@@ -27,7 +27,7 @@ export default async function AdminDashboardOverview() {
     recentEnquiries,
   ] = await Promise.all([
     prisma.enquiry.count().catch(() => 0),
-    prisma.enquiry.count({ where: { status: "NEW" } }).catch(() => 0),
+    prisma.enquiry.count({ where: { status: { in: ["PENDING", "NEW"] } } }).catch(() => 0),
     prisma.service.count({ where: { published: true } }).catch(() => 0),
     prisma.academicPackage.count({ where: { published: true } }).catch(() => 0),
     prisma.portfolioProject.count({ where: { published: true } }).catch(() => 0),
@@ -41,7 +41,7 @@ export default async function AdminDashboardOverview() {
   ]);
 
   const stats = [
-    { name: "Total Enquiries", value: totalEnquiries, icon: MessageSquare, badge: `${newEnquiries} New`, badgeColor: "bg-emerald-950 text-emerald-300 border-emerald-500/30" },
+    { name: "Total Enquiries", value: totalEnquiries, icon: MessageSquare, badge: `${newEnquiries} Pending`, badgeColor: "bg-amber-950 text-amber-300 border-amber-500/30" },
     { name: "Services", value: servicesCount, icon: Wrench, badge: "Active", badgeColor: "bg-[#2E4053] text-[#D5DBDB]" },
     { name: "Academic Packages", value: packagesCount, icon: GraduationCap, badge: "BCA & MCA", badgeColor: "bg-[#2E4053] text-[#D5DBDB]" },
     { name: "Portfolio Projects", value: portfolioCount, icon: FolderGit2, badge: "Published", badgeColor: "bg-[#2E4053] text-[#D5DBDB]" },
@@ -50,8 +50,13 @@ export default async function AdminDashboardOverview() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case "PENDING":
       case "NEW":
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-500/30">NEW</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-500/30">PENDING</span>;
+      case "ACCEPTED":
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/30">ACCEPTED ✅</span>;
+      case "REJECTED":
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-500/30">REJECTED ❌</span>;
       case "CONTACTED":
         return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-500/30">CONTACTED</span>;
       case "IN_PROGRESS":
@@ -59,7 +64,7 @@ export default async function AdminDashboardOverview() {
       case "COMPLETED":
         return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/30">COMPLETED</span>;
       default:
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#2E4053] text-[#AAB7B8]">CLOSED</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#2E4053] text-[#AAB7B8]">{status}</span>;
     }
   };
 

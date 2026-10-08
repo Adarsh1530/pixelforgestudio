@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
@@ -21,6 +22,26 @@ import {
 export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    if (pathname === "/admin/login") return;
+    const checkPending = async () => {
+      try {
+        const res = await fetch("/api/enquiries");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          const count = data.filter((e) => e.status === "PENDING" || e.status === "NEW").length;
+          setPendingCount(count);
+        }
+      } catch {
+        // Silently ignore background polling errors
+      }
+    };
+    checkPending();
+    const interval = setInterval(checkPending, 25000);
+    return () => clearInterval(interval);
+  }, [pathname]);
 
   if (pathname === "/admin/login") {
     return null;
@@ -107,7 +128,12 @@ export default function AdminSidebar() {
                       }`}
                     >
                       <Icon className={`w-4 h-4 ${isActive ? "text-[#F4F6F6]" : "text-[#AAB7B8]"}`} />
-                      <span>{item.name}</span>
+                      <span className="flex-1">{item.name}</span>
+                      {item.href === "/admin/enquiries" && pendingCount > 0 && (
+                        <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full bg-amber-400 text-[#1A252F] animate-pulse">
+                          {pendingCount}
+                        </span>
+                      )}
                     </Link>
                   );
                 })}

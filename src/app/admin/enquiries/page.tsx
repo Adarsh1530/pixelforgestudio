@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AdminHeader from "@/components/admin/AdminHeader";
 import {
   Search,
@@ -10,9 +10,15 @@ import {
   Trash2,
   Save,
   CheckCircle2,
+  XCircle,
   AlertCircle,
   ExternalLink,
   Filter,
+  Bell,
+  BellRing,
+  Sparkles,
+  Send,
+  RefreshCw,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -24,7 +30,7 @@ interface EnquiryItem {
   service: string;
   budget: string;
   description: string;
-  status: "NEW" | "CONTACTED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED";
+  status: "PENDING" | "ACCEPTED" | "REJECTED" | "NEW" | "CONTACTED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED";
   notes?: string | null;
   source: string;
   createdAt: string;
@@ -37,38 +43,172 @@ export default function AdminEnquiriesPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedEnquiry, setSelectedEnquiry] = useState<EnquiryItem | null>(null);
   const [editingNotes, setEditingNotes] = useState("");
-  const [editingStatus, setEditingStatus] = useState<EnquiryItem["status"]>("NEW");
+  const [editingStatus, setEditingStatus] = useState<EnquiryItem["status"]>("PENDING");
   const [updating, setUpdating] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  const fetchEnquiries = async () => {
+  // Workflow Decision State: "ACCEPT" | "REJECT" | null
+  const [decisionMode, setDecisionMode] = useState<"ACCEPT" | "REJECT" | null>(null);
+  const [decisionMessage, setDecisionMessage] = useState<string>("");
+
+  // Notification State
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const previousCountRef = useRef<number>(0);
+
+  const getAcceptanceMessage = (enq: EnquiryItem) => {
+    return (
+      `Hello ${enq.name}! 👋\n\n` +
+      `Thank you for contacting PixelForge Studio.\n\n` +
+      `✅ We are pleased to *ACCEPT* your project enquiry for:\n` +
+      `• Service: ${enq.service}\n` +
+      `• Budget: ${enq.budget}\n\n` +
+      `We would love to discuss the project requirements, architecture, and timeline with you. Let us know when it's convenient for a quick call or chat!\n\n` +
+      `Best regards,\n` +
+      `Keerthi Adarsh | PixelForge Studio\n` +
+      `📞 +91 87789 79416\n` +
+      `🌐 https://pxfgsd.vercel.app`
+    );
+  };
+
+  const getRejectionMessage = (enq: EnquiryItem) => {
+    return (
+      `Hello ${enq.name},\n\n` +
+      `Thank you for reaching out to PixelForge Studio regarding your enquiry for:\n` +
+      `• Service: ${enq.service}\n` +
+      `• Budget: ${enq.budget}\n\n` +
+      `❌ Unfortunately, we are currently unable to take on this project due to our existing development and scheduling commitments.\n\n` +
+      `We truly appreciate your interest in PixelForge Studio and wish you the very best with your project!\n\n` +
+      `Best regards,\n` +
+      `Keerthi Adarsh | PixelForge Studio\n` +
+      `📞 +91 87789 79416`
+    );
+  };
+
+  const fetchEnquiries = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await fetch("/api/enquiries");
       const data = await res.json();
       if (Array.isArray(data)) {
+        // Trigger browser notification if new enquiries arrived
+        if (
+          notificationsEnabled &&
+          previousCountRef.current > 0 &&
+          data.length > previousCountRef.current &&
+          typeof window !== "undefined" &&
+          "Notification" in window &&
+          Notification.permission === "granted"
+        ) {
+          const newest = data[0];
+          new Notification("🔔 New PixelForge Enquiry Received!", {
+            body: `From: ${newest.name} | Service: ${newest.service} | Budget: ${newest.budget}`,
+            icon: "/images/logo.png",
+          });
+        }
+        previousCountRef.current = data.length;
+
         setEnquiries(data);
         if (data.length > 0 && !selectedEnquiry) {
-          setSelectedEnquiry(data[0]);
-          setEditingNotes(data[0].notes || "");
-          setEditingStatus(data[0].status);
+          selectEnquiry(data[0]);
+        } else if (selectedEnquiry) {
+          const refreshed = data.find((item: EnquiryItem) => item.id === selectedEnquiry.id);
+          if (refreshed) {
+            setSelectedEnquiry(refreshed);
+          }
         }
       }
     } catch (err) {
       console.error("Fetch enquiries failed:", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
+  // Initial load and periodic polling every 20s
   useEffect(() => {
     fetchEnquiries();
-  }, []);
+    const interval = setInterval(() => {
+      fetchEnquiries(true);
+    }, 20000);
+    return () => clearInterval(interval);
+  }, [notificationsEnabled]);
 
-  const handleSelect = (enq: EnquiryItem) => {
+  const requestNotificationPermission = async () => {
+    if (typeof window !== "undefined" && "Notification" in window) {
+      const perm = await Notification.requestPermission();
+      if (perm === "granted") {
+        setNotificationsEnabled(true);
+        new Notification("🔔 PixelForge Notifications Enabled", {
+          body: "You will be alerted when prospective clients submit project enquiries.",
+          icon: "/images/logo.png",
+        });
+      }
+    }
+  };
+
+  const selectEnquiry = (enq: EnquiryItem) => {
     setSelectedEnquiry(enq);
     setEditingNotes(enq.notes || "");
     setEditingStatus(enq.status);
+    // Reset decision mode when selecting another enquiry
+    setDecisionMode(null);
+    setDecisionMessage("");
+  };
+
+  const handleTriggerDecision = (mode: "ACCEPT" | "REJECT") => {
+    if (!selectedEnquiry) return;
+    setDecisionMode(mode);
+    if (mode === "ACCEPT") {
+      setDecisionMessage(getAcceptanceMessage(selectedEnquiry));
+    } else {
+      setDecisionMessage(getRejectionMessage(selectedEnquiry));
+    }
+  };
+
+  const handleSendDecisionOnWhatsApp = async () => {
+    if (!selectedEnquiry || !decisionMode) return;
+    setUpdating(true);
+
+    const targetStatus = decisionMode === "ACCEPT" ? "ACCEPTED" : "REJECTED";
+    const cleanPhone = selectedEnquiry.phone.replace(/[^0-9]/g, "");
+    const encodedText = encodeURIComponent(decisionMessage);
+    const waUrl = `https://wa.me/${cleanPhone}?text=${encodedText}`;
+
+    try {
+      const logNote = `[${new Date().toLocaleString()}]: Marked as ${targetStatus} and WhatsApp response prepared.`;
+      const updatedNotes = selectedEnquiry.notes
+        ? `${selectedEnquiry.notes}\n${logNote}`
+        : logNote;
+
+      const res = await fetch(`/api/admin/enquiries/${selectedEnquiry.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          status: targetStatus,
+          notes: updatedNotes,
+        }),
+      });
+
+      if (res.ok) {
+        setSelectedEnquiry((prev) =>
+          prev ? { ...prev, status: targetStatus, notes: updatedNotes } : null
+        );
+        setEditingStatus(targetStatus);
+        setEditingNotes(updatedNotes);
+        setEnquiries((prev) =>
+          prev.map((e) =>
+            e.id === selectedEnquiry.id ? { ...e, status: targetStatus, notes: updatedNotes } : e
+          )
+        );
+
+        // Open WhatsApp in a new tab with client phone & pre-filled message
+        window.open(waUrl, "_blank");
+      }
+    } catch (err) {
+      console.error("Failed to update enquiry status:", err);
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const handleUpdateStatusNotes = async () => {
@@ -85,7 +225,7 @@ export default function AdminEnquiriesPage() {
       });
 
       if (res.ok) {
-        await fetchEnquiries();
+        await fetchEnquiries(true);
         setSelectedEnquiry((prev) =>
           prev ? { ...prev, status: editingStatus, notes: editingNotes } : null
         );
@@ -102,11 +242,69 @@ export default function AdminEnquiriesPage() {
       const res = await fetch(`/api/admin/enquiries/${id}`, { method: "DELETE" });
       if (res.ok) {
         setDeleteConfirmId(null);
-        if (selectedEnquiry?.id === id) setSelectedEnquiry(null);
-        await fetchEnquiries();
+        if (selectedEnquiry?.id === id) {
+          setSelectedEnquiry(null);
+          setDecisionMode(null);
+        }
+        await fetchEnquiries(true);
       }
     } catch (err) {
       console.error("Failed to delete enquiry:", err);
+    }
+  };
+
+  const pendingCount = enquiries.filter(
+    (e) => e.status === "PENDING" || e.status === "NEW"
+  ).length;
+
+  const renderStatusBadge = (status: string) => {
+    switch (status) {
+      case "PENDING":
+      case "NEW":
+        return (
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-500/40 animate-pulse">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            PENDING
+          </span>
+        );
+      case "ACCEPTED":
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/40">
+            <CheckCircle2 className="w-3 h-3" />
+            ACCEPTED
+          </span>
+        );
+      case "REJECTED":
+        return (
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/40">
+            <XCircle className="w-3 h-3" />
+            REJECTED
+          </span>
+        );
+      case "CONTACTED":
+        return (
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30">
+            CONTACTED
+          </span>
+        );
+      case "IN_PROGRESS":
+        return (
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-500/30">
+            IN PROGRESS
+          </span>
+        );
+      case "COMPLETED":
+        return (
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+            COMPLETED
+          </span>
+        );
+      default:
+        return (
+          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#1C2833] text-[#AAB7B8]">
+            CLOSED
+          </span>
+        );
     }
   };
 
@@ -117,19 +315,78 @@ export default function AdminEnquiriesPage() {
       e.phone.toLowerCase().includes(search.toLowerCase()) ||
       e.service.toLowerCase().includes(search.toLowerCase());
 
-    const matchesStatus = statusFilter === "ALL" || e.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    if (statusFilter === "ALL") return matchesSearch;
+    if (statusFilter === "PENDING") {
+      return matchesSearch && (e.status === "PENDING" || e.status === "NEW");
+    }
+    return matchesSearch && e.status === statusFilter;
   });
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <AdminHeader
         title="Enquiry Lead Management"
-        description="Search, process, assign status, and contact prospective clients."
+        description="Review incoming website enquiries, accept or reject leads, and respond via WhatsApp."
       />
 
       <main className="p-6 space-y-6">
-        
+
+        {/* Real-time Notification Alert Bar */}
+        {pendingCount > 0 ? (
+          <div className="bg-amber-950/70 border border-amber-500/40 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-lg animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/30">
+                <BellRing className="w-5 h-5 animate-bounce" />
+              </div>
+              <div>
+                <h4 className="text-sm font-bold text-amber-200">
+                  {pendingCount} Pending {pendingCount === 1 ? "Enquiry" : "Enquiries"} Awaiting Review
+                </h4>
+                <p className="text-xs text-amber-300/80">
+                  Clients are waiting for project consultation. Accept or reject leads below to send WhatsApp responses.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {!notificationsEnabled && (
+                <button
+                  type="button"
+                  onClick={requestNotificationPermission}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                >
+                  <Bell className="w-3.5 h-3.5" />
+                  Enable Desktop Alerts
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => fetchEnquiries(false)}
+                className="p-2 rounded-xl bg-[#1C2833] text-[#D5DBDB] hover:text-[#F4F6F6] border border-[#D5DBDB]/15 transition-colors"
+                title="Refresh list"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-[#2E4053]/30 border border-[#D5DBDB]/10 rounded-2xl p-3 px-4 flex items-center justify-between text-xs text-[#AAB7B8]">
+            <span className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              All leads processed. Real-time polling active.
+            </span>
+            {!notificationsEnabled && (
+              <button
+                type="button"
+                onClick={requestNotificationPermission}
+                className="text-xs text-[#D5DBDB] hover:text-[#F4F6F6] underline flex items-center gap-1"
+              >
+                <Bell className="w-3 h-3" /> Enable Browser Notifications
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Top Search & Filter Bar */}
         <div className="bg-[#2E4053]/40 border border-[#D5DBDB]/15 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4">
           <div className="relative flex-1 min-w-[240px]">
@@ -151,7 +408,9 @@ export default function AdminEnquiriesPage() {
               className="px-3.5 py-2.5 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6] focus:outline-none"
             >
               <option value="ALL">All Statuses ({enquiries.length})</option>
-              <option value="NEW">New Lead</option>
+              <option value="PENDING">Pending Review ({pendingCount})</option>
+              <option value="ACCEPTED">Accepted ✅</option>
+              <option value="REJECTED">Rejected ❌</option>
               <option value="CONTACTED">Contacted</option>
               <option value="IN_PROGRESS">In Progress</option>
               <option value="COMPLETED">Completed</option>
@@ -160,47 +419,60 @@ export default function AdminEnquiriesPage() {
           </div>
         </div>
 
-        {/* Master / Detail Split View */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Two-Column Split Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          {/* Left Master List (5 Cols) */}
-          <div className="lg:col-span-5 bg-[#2E4053]/30 border border-[#D5DBDB]/15 rounded-2xl overflow-hidden flex flex-col h-[650px]">
-            <div className="p-4 border-b border-[#D5DBDB]/10 bg-[#1C2833]/60 flex items-center justify-between">
-              <span className="text-xs font-mono uppercase text-[#AAB7B8]">
-                Leads List ({filteredEnquiries.length})
+          {/* Left Enquiries List (5 Cols) */}
+          <div className="lg:col-span-5 bg-[#2E4053]/30 border border-[#D5DBDB]/15 rounded-2xl overflow-hidden flex flex-col h-[700px]">
+            <div className="p-4 border-b border-[#D5DBDB]/10 flex items-center justify-between bg-[#1C2833]/50">
+              <span className="text-xs font-bold text-[#F4F6F6] uppercase tracking-wider">
+                Enquiry Inbox ({filteredEnquiries.length})
               </span>
+              <button
+                type="button"
+                onClick={() => fetchEnquiries(false)}
+                className="text-xs text-[#AAB7B8] hover:text-[#F4F6F6] inline-flex items-center gap-1"
+              >
+                <RefreshCw className="w-3 h-3" /> Refresh
+              </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-[#D5DBDB]/10">
-              {loading ? (
-                <div className="p-8 text-center text-xs text-[#AAB7B8]">Loading enquiries...</div>
+            <div className="overflow-y-auto flex-1 divide-y divide-[#D5DBDB]/10">
+              {loading && enquiries.length === 0 ? (
+                <div className="p-8 text-center text-xs text-[#AAB7B8]">Loading enquiry leads...</div>
               ) : filteredEnquiries.length === 0 ? (
-                <div className="p-8 text-center text-xs text-[#AAB7B8]">No matching enquiries found.</div>
+                <div className="p-8 text-center text-xs text-[#AAB7B8]">No enquiries found matching filter.</div>
               ) : (
                 filteredEnquiries.map((enq) => {
                   const isSelected = selectedEnquiry?.id === enq.id;
+                  const isPending = enq.status === "PENDING" || enq.status === "NEW";
+
                   return (
                     <div
                       key={enq.id}
-                      onClick={() => handleSelect(enq)}
-                      className={`p-4 cursor-pointer transition-colors ${
+                      onClick={() => selectEnquiry(enq)}
+                      className={`p-4 transition-all cursor-pointer ${
                         isSelected
-                          ? "bg-[#2E4053] border-l-4 border-l-[#F4F6F6]"
+                          ? "bg-[#2E4053] border-l-4 border-l-emerald-400"
+                          : isPending
+                          ? "bg-amber-950/20 hover:bg-[#2E4053]/40 border-l-2 border-l-amber-500/50"
                           : "hover:bg-[#2E4053]/40"
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="text-sm font-bold text-[#F4F6F6] truncate">{enq.name}</h4>
-                        <span className="text-[10px] text-[#AAB7B8] font-mono">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-xs font-bold text-[#F4F6F6] truncate max-w-[170px]">
+                          {enq.name}
+                        </span>
+                        <span className="text-[10px] text-[#AAB7B8]">
                           {formatDate(enq.createdAt)}
                         </span>
                       </div>
-                      <p className="text-xs font-medium text-[#D5DBDB] mb-1">{enq.service}</p>
+                      <p className="text-xs font-medium text-[#D5DBDB] mb-1.5 truncate">
+                        {enq.service}
+                      </p>
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-[#AAB7B8]">{enq.budget}</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#1C2833] text-[#D5DBDB]">
-                          {enq.status}
-                        </span>
+                        <span className="text-[11px] text-[#AAB7B8] font-mono">{enq.budget}</span>
+                        {renderStatusBadge(enq.status)}
                       </div>
                     </div>
                   );
@@ -210,29 +482,23 @@ export default function AdminEnquiriesPage() {
           </div>
 
           {/* Right Detail & Operations View (7 Cols) */}
-          <div className="lg:col-span-7 bg-[#2E4053]/30 border border-[#D5DBDB]/15 rounded-2xl p-6 flex flex-col justify-between h-[650px] overflow-y-auto">
+          <div className="lg:col-span-7 bg-[#2E4053]/30 border border-[#D5DBDB]/15 rounded-2xl p-6 flex flex-col justify-between h-[700px] overflow-y-auto">
             {selectedEnquiry ? (
               <div className="space-y-6">
                 
-                {/* Header & Quick Action Trigger Buttons */}
+                {/* Header Client Overview */}
                 <div className="pb-4 border-b border-[#D5DBDB]/10 flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <h3 className="text-xl font-bold text-[#F4F6F6]">{selectedEnquiry.name}</h3>
+                    <div className="flex items-center gap-2.5 mb-1">
+                      <h3 className="text-xl font-bold text-[#F4F6F6]">{selectedEnquiry.name}</h3>
+                      {renderStatusBadge(selectedEnquiry.status)}
+                    </div>
                     <p className="text-xs text-[#AAB7B8]">
                       Submitted on {formatDate(selectedEnquiry.createdAt)} via {selectedEnquiry.source}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <a
-                      href={`https://wa.me/${selectedEnquiry.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${selectedEnquiry.name}, regarding your ${selectedEnquiry.service} enquiry:`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-900 transition-colors"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5" />
-                      WhatsApp
-                    </a>
                     <a
                       href={`tel:${selectedEnquiry.phone.replace(/[^0-9+]/g, "")}`}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1C2833] text-[#F4F6F6] border border-[#D5DBDB]/20 text-xs font-semibold hover:bg-[#2E4053] transition-colors"
@@ -248,6 +514,95 @@ export default function AdminEnquiriesPage() {
                       Email
                     </a>
                   </div>
+                </div>
+
+                {/* 1-CLICK ACCEPT / REJECT WORKFLOW PANEL */}
+                <div className="p-5 rounded-2xl bg-[#1C2833] border border-[#D5DBDB]/15 shadow-xl space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#F4F6F6] flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-emerald-400" />
+                        Decision Workflow: Accept or Reject Lead
+                      </span>
+                      <p className="text-xs text-[#AAB7B8] mt-0.5">
+                        Choose an action to generate a pre-filled WhatsApp response for this client.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Accept & Reject Action Buttons */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => handleTriggerDecision("ACCEPT")}
+                      className={`inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer ${
+                        decisionMode === "ACCEPT"
+                          ? "bg-emerald-600 text-white ring-2 ring-emerald-400 shadow-emerald-950/60"
+                          : selectedEnquiry.status === "ACCEPTED"
+                          ? "bg-emerald-950/80 text-emerald-300 border border-emerald-500/40"
+                          : "bg-[#2E4053] hover:bg-emerald-700 hover:text-white text-[#F4F6F6] border border-[#D5DBDB]/15"
+                      }`}
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span>{selectedEnquiry.status === "ACCEPTED" ? "Accepted (Review Message)" : "ACCEPT Enquiry"}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleTriggerDecision("REJECT")}
+                      className={`inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer ${
+                        decisionMode === "REJECT"
+                          ? "bg-rose-700 text-white ring-2 ring-rose-400 shadow-rose-950/60"
+                          : selectedEnquiry.status === "REJECTED"
+                          ? "bg-rose-950/80 text-rose-300 border border-rose-500/40"
+                          : "bg-[#2E4053] hover:bg-rose-800 hover:text-white text-[#F4F6F6] border border-[#D5DBDB]/15"
+                      }`}
+                    >
+                      <XCircle className="w-4 h-4 text-rose-400" />
+                      <span>{selectedEnquiry.status === "REJECTED" ? "Rejected (Review Message)" : "REJECT Enquiry"}</span>
+                    </button>
+                  </div>
+
+                  {/* Predefined WhatsApp Message Editor & Send on WhatsApp Action */}
+                  {decisionMode && (
+                    <div className="pt-3 border-t border-[#D5DBDB]/10 space-y-3 animate-fade-in">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-[#D5DBDB] flex items-center gap-1.5">
+                          <MessageSquare className="w-3.5 h-3.5 text-[#25D366]" />
+                          Predefined {decisionMode === "ACCEPT" ? "Acceptance" : "Rejection"} WhatsApp Message (Editable):
+                        </span>
+                        <span className="text-[10px] text-[#AAB7B8]">Target: {selectedEnquiry.phone}</span>
+                      </div>
+
+                      <textarea
+                        rows={7}
+                        value={decisionMessage}
+                        onChange={(e) => setDecisionMessage(e.target.value)}
+                        className="w-full p-3 rounded-xl bg-[#2E4053]/70 border border-[#D5DBDB]/20 text-xs text-[#F4F6F6] font-mono leading-relaxed focus:outline-none focus:border-[#D5DBDB] resize-y"
+                        placeholder="WhatsApp message..."
+                      />
+
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setDecisionMode(null)}
+                          className="text-xs text-[#AAB7B8] hover:text-[#F4F6F6] transition-colors"
+                        >
+                          Cancel
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleSendDecisionOnWhatsApp}
+                          disabled={updating}
+                          className="inline-flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-xs font-bold uppercase tracking-wider text-[#1C2833] bg-[#25D366] hover:bg-[#20ba59] disabled:opacity-50 transition-all shadow-lg shadow-emerald-950/60 cursor-pointer"
+                        >
+                          <Send className="w-4 h-4 fill-current" />
+                          <span>{updating ? "Saving..." : "Send on WhatsApp"}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Details Grid */}
@@ -280,18 +635,20 @@ export default function AdminEnquiriesPage() {
                   </div>
                 </div>
 
-                {/* Internal Notes & Status Update Controls */}
+                {/* Internal Notes & Manual Status Dropdown */}
                 <div className="p-4 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/10 space-y-4">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold uppercase tracking-wider text-[#AAB7B8]">
-                      Update Lead Status
+                      Manual Status Override
                     </label>
                     <select
                       value={editingStatus}
                       onChange={(e) => setEditingStatus(e.target.value as any)}
                       className="px-3 py-1.5 rounded-lg bg-[#2E4053] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6]"
                     >
-                      <option value="NEW">NEW LEAD</option>
+                      <option value="PENDING">PENDING</option>
+                      <option value="ACCEPTED">ACCEPTED ✅</option>
+                      <option value="REJECTED">REJECTED ❌</option>
                       <option value="CONTACTED">CONTACTED</option>
                       <option value="IN_PROGRESS">IN PROGRESS</option>
                       <option value="COMPLETED">COMPLETED</option>
@@ -301,19 +658,20 @@ export default function AdminEnquiriesPage() {
 
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-[#AAB7B8] mb-1">
-                      Internal Notes
+                      Internal Notes & History
                     </label>
                     <textarea
                       rows={3}
                       value={editingNotes}
                       onChange={(e) => setEditingNotes(e.target.value)}
-                      placeholder="Add confidential notes (e.g. quoted ₹25k, viva guide scheduled...)"
+                      placeholder="Add confidential notes (e.g. quote ₹25k, viva guide scheduled...)"
                       className="w-full p-3 rounded-lg bg-[#2E4053] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6] placeholder-[#AAB7B8]/50 focus:outline-none resize-none"
                     />
                   </div>
 
                   <div className="flex items-center justify-between pt-2">
                     <button
+                      type="button"
                       onClick={() => setDeleteConfirmId(selectedEnquiry.id)}
                       className="px-3 py-1.5 rounded-lg bg-rose-950/60 text-rose-300 border border-rose-500/30 text-xs font-semibold hover:bg-rose-900 transition-colors inline-flex items-center gap-1"
                     >
@@ -322,6 +680,7 @@ export default function AdminEnquiriesPage() {
                     </button>
 
                     <button
+                      type="button"
                       onClick={handleUpdateStatusNotes}
                       disabled={updating}
                       className="px-4 py-2 rounded-lg bg-[#F4F6F6] text-[#1C2833] text-xs font-bold hover:bg-[#D5DBDB] transition-colors inline-flex items-center gap-1.5"
@@ -356,12 +715,14 @@ export default function AdminEnquiriesPage() {
               </p>
               <div className="flex items-center justify-end gap-3 pt-2">
                 <button
+                  type="button"
                   onClick={() => setDeleteConfirmId(null)}
                   className="px-4 py-2 rounded-lg text-xs font-semibold text-[#AAB7B8] hover:bg-[#2E4053]"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDeleteEnquiry(deleteConfirmId)}
                   className="px-4 py-2 rounded-lg text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white"
                 >

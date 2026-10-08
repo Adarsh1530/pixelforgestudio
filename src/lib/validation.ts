@@ -80,6 +80,15 @@ export const SiteSettingsSchema = z.object({
 });
 
 export const EnquiryUpdateSchema = z.object({
-  status: z.enum(["NEW", "CONTACTED", "IN_PROGRESS", "COMPLETED", "CLOSED"]),
+  status: z.enum([
+    "PENDING",
+    "ACCEPTED",
+    "REJECTED",
+    "NEW",
+    "CONTACTED",
+    "IN_PROGRESS",
+    "COMPLETED",
+    "CLOSED",
+  ]),
   notes: z.string().optional(),
 });
