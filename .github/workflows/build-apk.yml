@@ -28,21 +28,17 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Build Android Release APK
-        working-directory: ./android-admin
-        run: |
-          gradle assembleRelease --no-daemon
+      - name: Build Android APK with Gradle
+        uses: gradle/gradle-build-action@v3
+        with:
+          gradle-version: '8.5'
+          build-root-directory: ./android-admin
+          arguments: assembleRelease --no-daemon --stacktrace
 
       - name: Prepare APK Asset
         run: |
           mkdir -p release-assets
-          cp android-admin/app/build/outputs/apk/release/*.apk release-assets/PixelForge-Admin.apk
+          find android-admin/app/build/outputs/apk/ -name "*.apk" -exec cp {} release-assets/PixelForge-Admin.apk \;
           ls -la release-assets/
 
       - name: Upload APK as Workflow Artifact
