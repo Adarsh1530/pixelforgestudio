@@ -1,0 +1,7 @@
+<resources>
+    <color name="bg_dark">#0B132B</color>
+    <color name="primary_navy">#1A252F</color>
+    <color name="accent_teal">#00FFCC</color>
+    <color name="accent_amber">#F59E0B</color>
+    <color name="white">#FFFFFF</color>
+</resources>

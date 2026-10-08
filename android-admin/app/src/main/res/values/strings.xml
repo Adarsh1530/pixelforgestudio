@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">PixelForge Admin</string>
+    <string name="channel_name">PixelForge Enquiry Alerts</string>
+    <string name="channel_description">Instant notifications when clients submit project enquiries</string>
+</resources>

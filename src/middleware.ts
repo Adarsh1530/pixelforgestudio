@@ -30,9 +30,16 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow /admin/mobile to render (manages authentication client-side with persistent storage)
+  if (pathname === "/admin/mobile") {
+    return NextResponse.next();
+  }
+
   // Protect all /admin pages and /api/admin/* endpoints
   if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
-    const token = request.cookies.get(AUTH_COOKIE_NAME)?.value;
+    const authHeader = request.headers.get("authorization");
+    const bearerToken = authHeader?.startsWith("Bearer ") ? authHeader.substring(7) : null;
+    const token = request.cookies.get(AUTH_COOKIE_NAME)?.value || bearerToken;
 
     if (!token) {
       if (pathname.startsWith("/api/")) {

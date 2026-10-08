@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     const token = await signToken({ userId: user.id, email: user.email });
     await setAuthCookie(token);
 
-    const response = NextResponse.json({ success: true, message: "Logged in successfully" });
+    const response = NextResponse.json({ success: true, token, message: "Logged in successfully" });
     response.cookies.set("pf_admin_session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

@@ -1,0 +1,78 @@
+name: Build PixelForge Admin APK
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'android-admin/**'
+      - '.github/workflows/build-apk.yml'
+      - 'src/app/admin/mobile/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Android Release APK
+        working-directory: ./android-admin
+        run: |
+          gradle assembleRelease --no-daemon
+
+      - name: Prepare APK Asset
+        run: |
+          mkdir -p release-assets
+          cp android-admin/app/build/outputs/apk/release/*.apk release-assets/PixelForge-Admin.apk
+          ls -la release-assets/
+
+      - name: Upload APK as Workflow Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PixelForge-Admin-APK
+          path: release-assets/PixelForge-Admin.apk
+          retention-days: 30
+
+      - name: Publish GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: admin-app-v1.0
+          name: "PixelForge Admin Android App v1.0"
+          body: |
+            ## 📱 PixelForge Studio Admin Android APK
+            
+            This is the dedicated Admin App for **Keerthi Adarsh**:
+            - 🔔 **Instant Enquiry Alerts**: Native Android notifications with sound and vibration when clients submit project requests.
+            - 📋 **Live Enquiries Dashboard**: Shows only prospective client enquiries (Pending, Accepted, Rejected).
+            - ⚡ **1-Tap Accept / Reject**: Auto-generates personalized WhatsApp replies.
+            - 📲 **Direct WhatsApp Launch**: Pre-fills the client's phone number and response message ready to send.
+            
+            ### How to Install on Your Android Phone:
+            1. Download `PixelForge-Admin.apk` below directly to your phone.
+            2. Tap the downloaded file to install (allow "Install from unknown sources" if prompted).
+            3. Open the app and log in once — you are permanently connected to your live studio enquiries!
+          files: release-assets/PixelForge-Admin.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
