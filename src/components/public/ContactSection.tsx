@@ -33,7 +33,6 @@ export default function ContactSection({ settings }: ContactSectionProps) {
 
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [submittedWhatsAppUrl, setSubmittedWhatsAppUrl] = useState("");
   const [submittedClientName, setSubmittedClientName] = useState("");
 
   useEffect(() => {
@@ -64,19 +63,6 @@ export default function ContactSection({ settings }: ContactSectionProps) {
     setStatus("submitting");
     setErrorMessage("");
 
-    // Prepare WhatsApp prefilled message
-    const adminWhatsApp = cleanWhatsapp || "918778979416";
-    const clientWaText =
-      `Hello Keerthi Adarsh, I just submitted an enquiry on PixelForge Studio:\n\n` +
-      `• Name: ${formData.name}\n` +
-      `• Service: ${formData.service}\n` +
-      `• Budget: ${formData.budget}\n` +
-      `• Phone: ${formData.phone}\n` +
-      `• Email: ${formData.email}\n` +
-      (formData.description ? `• Details: ${formData.description}` : "");
-
-    const fallbackWaUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(clientWaText)}`;
-
     try {
       const res = await fetch("/api/enquiries", {
         method: "POST",
@@ -90,17 +76,8 @@ export default function ContactSection({ settings }: ContactSectionProps) {
         throw new Error(data?.error || "Failed to submit enquiry.");
       }
 
-      const waUrl = data?.whatsappUrl || fallbackWaUrl;
-      setSubmittedWhatsAppUrl(waUrl);
       setSubmittedClientName(formData.name);
       setStatus("success");
-
-      // Attempt to open WhatsApp directly for immediate chat
-      try {
-        window.open(waUrl, "_blank");
-      } catch {
-        // Popups might be blocked on some browsers; user can tap button directly
-      }
 
       setFormData({
         name: "",
