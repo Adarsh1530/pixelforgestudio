@@ -80,6 +80,8 @@ export async function POST(request: Request) {
 
     revalidatePath("/admin");
     revalidatePath("/admin/enquiries");
+    revalidatePath("/mobile-admin");
+    revalidatePath("/admin/mobile");
 
     // 1. Dispatch background server-to-phone WhatsApp alert if API key configured
     sendWhatsAppServerNotification(result.data);

@@ -247,33 +247,21 @@ export default function ContactSection({ settings }: ContactSectionProps) {
               </p>
 
               {status === "success" ? (
-                <div className="bg-emerald-950/80 border border-emerald-500/30 rounded-2xl p-6 sm:p-8 text-center">
-                  <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
-                  <h4 className="text-xl font-bold text-[#F4F6F6] mb-1">
+                <div className="bg-emerald-950/80 border border-emerald-500/30 rounded-2xl p-6 sm:p-8 text-center animate-in fade-in duration-300">
+                  <CheckCircle2 className="w-14 h-14 text-emerald-400 mx-auto mb-3" />
+                  <h4 className="text-xl font-bold text-[#F4F6F6] mb-2">
                     Enquiry Submitted Successfully!
                   </h4>
                   <p className="text-xs text-[#D5DBDB] leading-relaxed mb-6 max-w-md mx-auto">
                     {submittedClientName ? `Thank you, ${submittedClientName}! ` : "Thank you! "}
-                    Your project details have been recorded. You can now chat directly with <strong className="text-[#F4F6F6]">Keerthi Adarsh</strong> on WhatsApp with all your enquiry details ready.
+                    Your project enquiry has been successfully received. Keerthi Adarsh and the PixelForge Studio team will review your requirements and reach out to you shortly.
                   </p>
 
-                  <div className="space-y-3 max-w-sm mx-auto">
-                    {submittedWhatsAppUrl && (
-                      <a
-                        href={submittedWhatsAppUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full inline-flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-xl text-xs font-bold uppercase tracking-wider text-[#1C2833] bg-[#25D366] hover:bg-[#20ba59] transition-all shadow-lg shadow-emerald-950/50"
-                      >
-                        <MessageSquare className="w-4 h-4 fill-current" />
-                        <span>Chat with Keerthi Adarsh on WhatsApp</span>
-                      </a>
-                    )}
-
+                  <div className="max-w-xs mx-auto">
                     <button
                       type="button"
                       onClick={() => setStatus("idle")}
-                      className="w-full py-2.5 px-4 text-xs font-semibold text-[#AAB7B8] hover:text-[#F4F6F6] transition-colors cursor-pointer"
+                      className="py-2.5 px-5 rounded-xl text-xs font-semibold bg-[#2E4053] text-[#F4F6F6] hover:bg-[#2E4053]/80 transition-colors cursor-pointer border border-[#D5DBDB]/15"
                     >
                       ← Submit Another Enquiry
                     </button>
