@@ -10,7 +10,6 @@ import {
   ArrowRight,
   Clock,
   CheckCircle2,
-  XCircle,
   ExternalLink,
 } from "lucide-react";
 import { formatDateShort } from "@/lib/utils";
@@ -51,10 +50,6 @@ export default async function AdminDashboardOverview() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "ACCEPTED":
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/30">ACCEPTED</span>;
-      case "REJECTED":
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-950 text-rose-300 border border-rose-500/30">REJECTED</span>;
       case "NEW":
         return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-950 text-amber-300 border border-amber-500/30">NEW</span>;
       case "CONTACTED":
@@ -185,32 +180,12 @@ export default async function AdminDashboardOverview() {
                         <td className="py-3.5 px-5 text-[#AAB7B8] text-[11px]">
                           {formatDateShort(enq.createdAt)}
                         </td>
-                        <td className="py-3.5 px-5 text-right space-x-1.5 whitespace-nowrap">
-                          <a
-                            href={`/api/enquiries/${enq.id}/action?type=accept`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Accept enquiry and open WhatsApp"
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold hover:bg-emerald-900 transition-colors"
-                          >
-                            <CheckCircle2 className="w-3 h-3" />
-                            Accept
-                          </a>
-                          <a
-                            href={`/api/enquiries/${enq.id}/action?type=reject`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title="Reject enquiry and open WhatsApp"
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-rose-950 text-rose-300 border border-rose-500/30 text-[11px] font-semibold hover:bg-rose-900 transition-colors"
-                          >
-                            <XCircle className="w-3 h-3" />
-                            Reject
-                          </a>
+                        <td className="py-3.5 px-5 text-right space-x-2">
                           <a
                             href={waLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#1C2833] text-[#D5DBDB] border border-[#D5DBDB]/10 text-[11px] font-semibold hover:bg-[#2E4053] transition-colors"
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 text-[11px] font-semibold hover:bg-emerald-900 transition-colors"
                           >
                             WhatsApp
                             <ExternalLink className="w-3 h-3" />
