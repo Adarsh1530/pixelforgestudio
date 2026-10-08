@@ -10,9 +10,11 @@ import {
   Trash2,
   Save,
   CheckCircle2,
+  XCircle,
   AlertCircle,
   ExternalLink,
   Filter,
+  Sparkles,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -24,7 +26,7 @@ interface EnquiryItem {
   service: string;
   budget: string;
   description: string;
-  status: "NEW" | "CONTACTED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED";
+  status: "NEW" | "ACCEPTED" | "REJECTED" | "CONTACTED" | "IN_PROGRESS" | "COMPLETED" | "CLOSED";
   notes?: string | null;
   source: string;
   createdAt: string;
@@ -110,6 +112,79 @@ export default function AdminEnquiriesPage() {
     }
   };
 
+  const handleDecision = async (action: "accept" | "reject") => {
+    if (!selectedEnquiry) return;
+    setUpdating(true);
+    try {
+      const res = await fetch(`/api/enquiries/${selectedEnquiry.id}/action`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      if (res.ok && data?.whatsappUrl) {
+        const updatedStatus = action === "accept" ? "ACCEPTED" : "REJECTED";
+        setEditingStatus(updatedStatus as any);
+        setSelectedEnquiry((prev) => (prev ? { ...prev, status: updatedStatus as any } : null));
+        setEnquiries((prev) =>
+          prev.map((e) => (e.id === selectedEnquiry.id ? { ...e, status: updatedStatus as any } : e))
+        );
+        window.open(data.whatsappUrl, "_blank");
+      }
+    } catch (err) {
+      console.error("Decision update failed:", err);
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const renderStatusBadge = (status: string) => {
+    switch (status) {
+      case "ACCEPTED":
+        return (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+            ACCEPTED
+          </span>
+        );
+      case "REJECTED":
+        return (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-500/30">
+            REJECTED
+          </span>
+        );
+      case "NEW":
+        return (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-500/30">
+            NEW
+          </span>
+        );
+      case "CONTACTED":
+        return (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-950 text-sky-300 border border-sky-500/30">
+            CONTACTED
+          </span>
+        );
+      case "IN_PROGRESS":
+        return (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-500/30">
+            IN PROGRESS
+          </span>
+        );
+      case "COMPLETED":
+        return (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-500/30">
+            COMPLETED
+          </span>
+        );
+      default:
+        return (
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#1C2833] text-[#AAB7B8]">
+            CLOSED
+          </span>
+        );
+    }
+  };
+
   const filteredEnquiries = enquiries.filter((e) => {
     const matchesSearch =
       e.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -151,7 +226,9 @@ export default function AdminEnquiriesPage() {
               className="px-3.5 py-2.5 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6] focus:outline-none"
             >
               <option value="ALL">All Statuses ({enquiries.length})</option>
-              <option value="NEW">New Lead</option>
+              <option value="NEW">New Leads</option>
+              <option value="ACCEPTED">Accepted ✅</option>
+              <option value="REJECTED">Rejected ❌</option>
               <option value="CONTACTED">Contacted</option>
               <option value="IN_PROGRESS">In Progress</option>
               <option value="COMPLETED">Completed</option>
@@ -198,9 +275,7 @@ export default function AdminEnquiriesPage() {
                       <p className="text-xs font-medium text-[#D5DBDB] mb-1">{enq.service}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-[11px] text-[#AAB7B8]">{enq.budget}</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#1C2833] text-[#D5DBDB]">
-                          {enq.status}
-                        </span>
+                        {renderStatusBadge(enq.status)}
                       </div>
                     </div>
                   );
@@ -250,6 +325,48 @@ export default function AdminEnquiriesPage() {
                   </div>
                 </div>
 
+                {/* Quick Decision: 1-Click Accept / Reject with WhatsApp Reply */}
+                <div className="p-4 rounded-xl bg-[#1C2833] border border-[#D5DBDB]/15 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold uppercase tracking-wider text-[#F4F6F6] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                      Decision & Instant Client Reply
+                    </span>
+                    {renderStatusBadge(selectedEnquiry.status)}
+                  </div>
+                  <p className="text-xs text-[#AAB7B8] leading-relaxed">
+                    Clicking instantly records the decision in the database and opens WhatsApp with a personalized message to the client.
+                  </p>
+                  <div className="flex items-center gap-3 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleDecision("accept")}
+                      disabled={updating || selectedEnquiry.status === "ACCEPTED"}
+                      className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md ${
+                        selectedEnquiry.status === "ACCEPTED"
+                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-default"
+                          : "bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50 hover:scale-[1.01]"
+                      } disabled:opacity-60`}
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      {selectedEnquiry.status === "ACCEPTED" ? "Enquiry Accepted ✅" : "Accept & Send WhatsApp"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDecision("reject")}
+                      disabled={updating || selectedEnquiry.status === "REJECTED"}
+                      className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md ${
+                        selectedEnquiry.status === "REJECTED"
+                          ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 cursor-default"
+                          : "bg-rose-700 hover:bg-rose-600 text-white shadow-rose-950/50 hover:scale-[1.01]"
+                      } disabled:opacity-60`}
+                    >
+                      <XCircle className="w-4 h-4" />
+                      {selectedEnquiry.status === "REJECTED" ? "Enquiry Rejected ❌" : "Reject & Send WhatsApp"}
+                    </button>
+                  </div>
+                </div>
+
                 {/* Details Grid */}
                 <div className="grid grid-cols-2 gap-4 text-xs bg-[#1C2833] p-4 rounded-xl border border-[#D5DBDB]/10">
                   <div>
@@ -292,6 +409,8 @@ export default function AdminEnquiriesPage() {
                       className="px-3 py-1.5 rounded-lg bg-[#2E4053] border border-[#D5DBDB]/20 text-xs text-[#F4F6F6]"
                     >
                       <option value="NEW">NEW LEAD</option>
+                      <option value="ACCEPTED">ACCEPTED</option>
+                      <option value="REJECTED">REJECTED</option>
                       <option value="CONTACTED">CONTACTED</option>
                       <option value="IN_PROGRESS">IN PROGRESS</option>
                       <option value="COMPLETED">COMPLETED</option>

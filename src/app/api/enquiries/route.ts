@@ -84,7 +84,8 @@ export async function POST(request: Request) {
     // 1. Dispatch background server-to-phone WhatsApp alert if API key configured
     sendWhatsAppServerNotification(result.data);
 
-    // 2. Generate client-to-admin WhatsApp pre-filled link
+    // 2. Generate client-to-admin WhatsApp pre-filled link with 1-click Accept / Reject actions
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://pxfgsd.vercel.app";
     const adminWhatsApp = "918778979416";
     const clientWaText =
       `Hello Keerthi Adarsh, I just submitted an enquiry on PixelForge Studio:\n\n` +
@@ -93,7 +94,13 @@ export async function POST(request: Request) {
       `• Budget: ${result.data.budget}\n` +
       `• Phone: ${result.data.phone}\n` +
       `• Email: ${result.data.email}\n` +
-      (result.data.description ? `• Details: ${result.data.description}` : "");
+      (result.data.description ? `• Details: ${result.data.description}\n\n` : "\n") +
+      `━━━━━━━━━━━━━━━━━━━\n` +
+      `ADMIN ACTIONS:\n` +
+      `✅ Accept & Reply:\n` +
+      `${baseUrl}/api/enquiries/${enquiry.id}/action?type=accept\n\n` +
+      `❌ Reject & Reply:\n` +
+      `${baseUrl}/api/enquiries/${enquiry.id}/action?type=reject`;
 
     const whatsappUrl = `https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(clientWaText)}`;
 
