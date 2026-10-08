@@ -52,8 +52,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: admin-app-v1.0
-          name: "PixelForge Admin Android App v1.0"
+          tag_name: admin-app-v1.1
+          name: "PixelForge Admin Android App v1.1"
           body: |
             ## 📱 PixelForge Studio Admin Android APK
             

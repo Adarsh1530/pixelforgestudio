@@ -20,6 +20,9 @@ import {
   Lock,
   LogOut,
   AlertCircle,
+  Eye,
+  EyeOff,
+  Zap,
 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
@@ -102,8 +105,9 @@ export default function MobileAdminPage() {
   // Authentication State
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
-  const [loginEmail, setLoginEmail] = useState("keerthiadarshmp@gmail.com");
+  const [loginEmail, setLoginEmail] = useState("admin@pixelforge.studio");
   const [loginPassword, setLoginPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
 
@@ -384,9 +388,28 @@ export default function MobileAdminPage() {
             )}
 
             <div className="space-y-1.5">
-              <label className="text-[11px] font-semibold text-[#AAB7B8] uppercase tracking-wider">
-                Admin Email
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-semibold text-[#AAB7B8] uppercase tracking-wider">
+                  Admin Email
+                </label>
+                <div className="flex gap-1 text-[10px]">
+                  <button
+                    type="button"
+                    onClick={() => setLoginEmail("admin@pixelforge.studio")}
+                    className="text-teal-400 hover:underline"
+                  >
+                    admin@
+                  </button>
+                  <span className="text-[#566573]">|</span>
+                  <button
+                    type="button"
+                    onClick={() => setLoginEmail("keerthiadarshmp@gmail.com")}
+                    className="text-teal-400 hover:underline"
+                  >
+                    keerthi@
+                  </button>
+                </div>
+              </div>
               <input
                 type="email"
                 required
@@ -402,16 +425,35 @@ export default function MobileAdminPage() {
               </label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   required
                   placeholder="Enter admin password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[#0F172A] border border-[#2E4053] text-sm text-white focus:outline-none focus:border-teal-400"
+                  className="w-full px-3.5 py-2.5 pr-10 rounded-xl bg-[#0F172A] border border-[#2E4053] text-sm text-white focus:outline-none focus:border-teal-400"
                 />
-                <Lock className="w-4 h-4 text-[#AAB7B8] absolute right-3 top-3" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-3 text-[#AAB7B8] hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
+
+            {/* Quick Auto-Fill Button */}
+            <button
+              type="button"
+              onClick={() => {
+                setLoginEmail("admin@pixelforge.studio");
+                setLoginPassword("PixelForge2026!");
+              }}
+              className="w-full py-2 px-3 rounded-xl bg-teal-400/10 border border-teal-400/30 text-teal-300 text-xs font-semibold hover:bg-teal-400/20 active:scale-95 transition-all flex items-center justify-center gap-1.5"
+            >
+              <Zap className="w-3.5 h-3.5 text-teal-300" />
+              <span>⚡ 1-Tap Auto-Fill Your Credentials</span>
+            </button>
 
             <button
               type="submit"
@@ -421,6 +463,12 @@ export default function MobileAdminPage() {
               {loginLoading ? "Authenticating..." : "Unlock Admin App"}
             </button>
           </form>
+
+          <div className="p-3 rounded-xl bg-[#0F172A]/80 border border-[#2E4053] text-[11px] text-[#AAB7B8] space-y-1">
+            <p className="font-semibold text-white">🔐 Login Credentials:</p>
+            <p>• <span className="text-teal-300 font-mono">admin@pixelforge.studio</span> (or <span className="text-teal-300 font-mono">keerthiadarshmp@gmail.com</span>)</p>
+            <p>• Password: <span className="text-amber-300 font-mono">PixelForge2026!</span></p>
+          </div>
 
           <p className="text-[10px] text-center text-[#7F8C8D]">
             🔒 Dedicated interface for Keerthi Adarsh (PixelForge Studio)

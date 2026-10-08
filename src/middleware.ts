@@ -30,8 +30,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow /admin/mobile to render (manages authentication client-side with persistent storage)
-  if (pathname === "/admin/mobile") {
+  // Allow /admin/mobile and /mobile-admin to render (manages authentication client-side with persistent storage)
+  if (pathname === "/admin/mobile" || pathname === "/mobile-admin") {
     return NextResponse.next();
   }
 

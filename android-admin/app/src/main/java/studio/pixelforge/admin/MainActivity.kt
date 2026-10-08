@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var swipeRefresh: SwipeRefreshLayout
     private val channelId = "pixelforge_enquiry_alerts"
-    private val appUrl = "https://pxfgsd.vercel.app/admin/mobile"
+    private val appUrl = "https://pxfgsd.vercel.app/mobile-admin"
 
     private val requestNotificationPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

@@ -24,8 +24,11 @@ export default function AdminSidebar() {
   const router = useRouter();
   const [pendingCount, setPendingCount] = useState(0);
 
+  if (pathname === "/admin/login" || pathname.startsWith("/admin/mobile")) {
+    return null;
+  }
+
   useEffect(() => {
-    if (pathname === "/admin/login") return;
     const checkPending = async () => {
       try {
         const res = await fetch("/api/enquiries");
